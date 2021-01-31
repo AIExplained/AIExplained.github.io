@@ -1,0 +1,1039 @@
+<!--
+  Copyright 2018 The Distill Template Authors
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!doctype html>
+
+<head>
+  <script src="../dist/template.v2.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf8">
+
+  <link rel="stylesheet" href="./chessboard/chessboard.css">
+  <script type="text/javascript" src="../lib/jquery-3.5.1.js"></script>
+  <script type="text/javascript" src="chessboard/chessboard.js"></script>
+
+  <link rel="stylesheet" href="../lib/jquery-ui-1.12.1.custom/jquery-ui.min.css">
+  <script src="../lib/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+</head>
+
+<body>
+  <distill-header></distill-header>
+  <d-front-matter>
+    <script id='distill-front-matter' type="text/json">{
+    "title": "Choosing Representation, Mutation, and Crossover in Evolutionary Algorithms",
+    "description": "Learn how the choice of representation affects your evolutionary algorithm.",
+    "published": "Dec 31, 2020",
+    "authors": [
+      {
+        "author":"Alexander Dockhorn",
+        "authorURL":"https://adockhorn.github.io/",
+        "affiliations": [{"name": "Queen Mary University London"}]
+      },
+      {
+        "author":"Simon Lucas",
+        "authorURL":"https://github.com/SimonLucas/",
+        "affiliations": [{"name": "Queen Mary University London"}]
+      }
+    ],
+    "katex": {
+      "delimiters": [
+        {"left": "$$", "right": "$$", "display": false}
+      ]
+    },
+    "toc":true
+  }</script>
+  </d-front-matter>
+  <d-title>
+    <p>An interactive article on solving the 8-Queens problem.
+      Learn how the choice of representation affects the other components of your evolutionary algorithm.</p>
+  </d-title>
+  <d-byline></d-byline>
+  <d-article id="root">
+    <d-contents id="toc" style="grid-column-start: 1;
+                                grid-column-end: 4;
+                                justify-self: end;
+                                padding-right: 3em;
+                                padding-left: 2em;
+                                border-right: 1px solid rgba(0, 0, 0, 0.1);
+                                border-right-width: 1px;
+                                border-right-style: solid;
+                                border-right-color: rgba(0, 0, 0, 0.1);">
+      <nav class="l-text toc figcaption" id="nav">
+        <h3>Contents</h3>
+      </nav>
+    </d-contents>
+    <script language="JavaScript" type="module">
+      $("distill-header")[0].style.display = "none";
+      $("distill-footer")[0].style.display = "none";
+      window.addEventListener('load', function() {
+        var toc = document.getElementById("nav");
+
+        // get headers and markers
+        let elements = [];
+        var tocItems = document.getElementsByTagName("H2");
+        //console.log(tocItems);
+        var linkItems = document.getElementsByClassName("marker");
+        var article = document.getElementById("root");
+        //console.log(linkItems);
+
+        for (let i=0, max=tocItems.length; i < max; i++) {
+          // Do something with the element here
+          elements[i] = {"element": tocItems[i], "index": Array.prototype.indexOf.call(article.children, tocItems[i])};
+        }
+        for (let i=0, max=linkItems.length; i < max; i++) {
+          // Do something with the element here
+          elements[tocItems.length+i] = {"element": linkItems[i], "index": Array.prototype.indexOf.call(article.children, linkItems[i])};
+        }
+
+        //sort them in order of appearance
+        elements.sort((a, b) => a["index"] - b["index"]);
+        console.log(elements);
+
+        //console.log("nToCEntries: " + tocItems.length);
+        var i;
+        let previous_header = toc;
+        for (i = 0; i < elements.length; i++) {
+          var item = elements[i]["element"];
+          if (item.tagName === "H2") {
+            console.log("h2");
+            //item.style.backgroundColor = "#EEEEEE";
+            let entry = document.createElement("div");
+            let link = document.createElement("a");
+            // console.log(item.innerHTML);
+            //console.log(item.innerText);
+            link.innerText = item.innerText;
+            link.href = "#" + item.innerText;
+            item.id = item.innerText;
+            entry.appendChild(link);
+            previous_header = entry;
+            toc.appendChild(entry);
+          }
+          else {
+            console.log("marker");
+            let list = document.createElement("ul");
+            list.style.marginBottom = "unset";
+            let entry = document.createElement("li");
+            let link = document.createElement("a");
+            // console.log(item.innerHTML);
+            //console.log(item.innerText);
+            link.innerText = item.innerText;
+            link.href = "#" + item.innerText;
+            item.id = item.innerText;
+            entry.appendChild(link);
+            list.appendChild(entry);
+            previous_header.appendChild(list);
+          }
+
+        }
+      })
+    </script>
+    <div>
+    <p>
+      Evolutionary algorithms (EAs) can be used to solve plenty of tasks using the power of evolutionary optimization.
+      One of the key tasks in the algorithm design process, is the choice of representation for a candidate solution.
+      While the phenotype describes a solution that is directly applicable to the task, the genotype is its
+      computational counter-part which is used during the optimization.
+      Given the task of optimizing a car for speed, the phenotype is represented by the actual car on the road, while
+      the genotype represents the cars configuration, e.g. the type of motor and the tires used.
+      During optimization, the computer will modify a candidates genotype.
+      The phenotype will be built according to the genotypes description for evaluation.
+    </p>
+
+    <p>
+      The mapping between genotype and phenotype plays an important part in the algorithm design process.
+      In this article, we will present EA design concepts based on a discussion of the 8-Queens problem.
+      This seemingly simple puzzle requires you to place eight queens on an $$8\times8$$ chessboard so
+      that no two queens threaten each other. Thus, no two queens share the same row, column or diagonal.
+      Do you think you are up to the task? Go ahead and try it yourself:
+    </p>
+    </div>
+    <div class="l-body" style="margin-bottom: 20px">
+      <div id="board-letsplay" style="width: 320px; margin: auto auto; margin-bottom: 10px"></div>
+      <div class="caption">Drag and drop queens to change their position. Try to position all queens
+        such that no two queens share the same row, column or diagonal. Queens that threaten each other
+        will be highlighted in red. In case you found a solution all queens will be highlighted in green.</div>
+    </div>
+    <script type="module" src="./chessboard/chessboard_lets_play.js"></script>
+
+
+    <h2>Representation</h2>
+    <p> An individual somehow needs to represents the solution that can be applied to our problem.
+      Here, we need to encode the position of queens on a chessboard. Lets first think, about the basic properties of
+      our task and its likely solutions:
+    </p>
+    <ol>
+      <li>a chessboard offers 64 fields arranged in an $$8\times8$$ grid</li>
+      <li>the solution consists of exactly 8 queens</li>
+      <li>each row can include only one queen, otherwise they would threaten each other</li>
+      <li>each column can include only one queen, otherwise they would threaten each other</li>
+      <li>each diagonal can include only one queen, otherwise they would threaten each other</li>
+    </ol>
+
+    <a class="marker" href="#matrix-representation"><span>Matrix Representation</span></a>
+    <p id="matrix-representation">
+      Based on these requirements, we are ready to start defining our first representation.
+      Just considering the first requirement may spawn some ideas already.
+      Lets consider a chessboard to be an $$8\times8$$ binary matrix in which a 0 encodes an empty field and a 1 a field
+      with a queen on it.
+      Test how this encoding works by by clicking on either a field of the chessboard or the cells of the matrix
+      to remove or add a queen at the clicked position.
+    </p>
+    <div>
+      <div style="overflow: hidden; width:max-content; margin: auto auto">
+        <div style="text-align: center">Matrix Representation</div>
+
+        <div id="board-for-matrix-representation" style="width: 160px; float: left; margin: auto auto; margin-right: 10px"></div>
+
+        <div id="board-matrix-representation" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
+        <script type="module" src="./chessboard/chessboard_matrix_representation.js"></script>
+      </div>
+      <div class="caption">Click on any field of the chessboard or cell in the matrix to toggle a queen.
+        See how the chessboard changes when clicking on the matrix and vice versa.</div>
+    </div>
+
+    <p>
+      This encoding can produce any possible queen placement of 0 to 64 queens on a regular chessboard.
+      Hence, the solution to this puzzle will be included in the set of encodable phenotypes.
+      Sadly, it also lets us create many candidates that violate the other requirements.
+      Using this representation, we can produce quite a lot different candidates. In total there are:
+    </p>
+
+    <d-math block>
+      2^{64} = 18\,446\,744\,073\,709\,551\,616
+    </d-math>
+
+    <a class="marker" href="#constrained-matrix-representation"><span>Constrained Matrix Representation</span></a>
+    <p id="constrained-matrix-representation">
+      Honestly, this might be a bit much to find one of the 92 solutions.
+      But we can easily improve on this by adding the second requirement to our encoding, namely no solution can have more or less than 8 queens.
+      Therefore, we need to limit the number of queens in our matrix to exactly 8.
+      If you tried to find a solution yourself, you have already used a similar encoding above.
+      Once again, lets try out the drag on drop approach for moving queens and see how it influences our encoding.
+    </p>
+    <div class="l-body" style="margin-bottom: 20px">
+      <div style="overflow: hidden; width:max-content; margin: auto auto">
+        <div style="text-align: center">Constrained Matrix Representation</div>
+        <div id="board-8-queens-matrix" style="width: 160px; float: left; margin: auto auto; margin-bottom: 10px; margin-right: 10px"></div>
+
+        <div id="board-8-queens-matrix-representation" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
+        <script type="module" src="./chessboard/chessboard_8_queens_matrix_representation.js"></script>
+      </div>
+      <div class="caption">
+        Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
+      </div>
+    </div>
+
+    <p>
+      This seems to be a small but intuitive change.
+      Nevertheless, it has a massive impact on the number of possible solutions.
+      Instead of $$2^{64}$$ it can produce only:
+      $$\binom{64}{8} = 4\,426\,165\,368$$
+    </p>
+
+    <a class="marker" href="#row-vector-representation"><span>Row Vector Representation</span></a>
+    <p id="row-vector-representation">
+      So far, we have incorporated the first two requirements in our encoding.
+      We can do even better by adding the constraints on rows, columns, and diagonals to it.
+      Lets consider an even more condensed representation using requirement 3.
+      Since each row can contain only a single queen, we can use a vector of size 8 to encode the column each queen is placed at.
+      Lets try how this works:
+    </p>
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="text-align: center">Row Vector Representation</div>
+        <div style="width: 200px; float:left; margin: 5px 5px">
+          <div id="board-row-vector-1" class="matrixsmall greyopac" style="width: 19px; height:152px; margin-bottom:5px; margin-left:2px; margin-right:10px; float: left"></div>
+          <div id="board-row-vector-example-1" style="width: 160px; margin-bottom:5px; float: left"></div>
+        </div>
+        <div style="width: 200px; float:left; margin: 5px 5px">
+          <div id="board-row-vector-2" class="matrixsmall greyopac" style="width: 19px; height:152px; margin-bottom:5px; margin-left:2px; margin-right:10px; float: left"></div>
+          <div id="board-row-vector-example-2" style="width: 160px; margin-bottom:5px; float: left"></div>
+        </div>
+        <div style="width: 200px; float:left; margin: 5px 5px; margin-right: 0px">
+          <div id="board-row-vector-3" class="matrixsmall greyopac" style="width: 19px; height:152px; margin-bottom:5px; margin-left:2px; margin-right:10px; float: left"></div>
+          <div id="board-row-vector-example-3" style="width: 160px; margin-bottom:5px; float: left"></div>
+        </div>
+      </div>
+      <div class="caption">Click on any cell of the vector to randomly move the respective queen to a new column.
+        You can also drag and drop queens on the board, but only place a queen on another column of the same row.
+      </div>
+      <script type="module" src="chessboard/chessboard_row_vector_representation.js"></script>
+    </div>
+    <p>
+      This might reduce the usability a bit, but the computer will probably have less problems with this issue.
+      In fact, the reduction to even less candidate solutions can drastically speed-up the time until a solution is found.
+      Implementing a row-vector encoding results in even less candidate solutions:
+      $$8^8 = 16\,777\,216$$
+    </p>
+
+    <a class="marker" href="#column-vector-representation"><span>Column Vector Representation</span></a>
+    <p id="column-vector-representation">
+      An interesting details of the 8-Queens problem is its symmetry.
+      This means a valid solution may be mirrored and rotated to produce new solutions.
+      The same symmetry can be found in the two requirements 3 and 4.
+      Hence, we could have implemented a column-vector encoding instead of a row-vector.
+      Go ahead and see how the column-vector representation works:
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="text-align: center">Column Vector Representation</div>
+        <div style="width: 180px; float:left; margin: 5px 5px">
+          <div id="board-vector-example-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-vector-1" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+        <div style="width: 180px; float:left; margin: 5px 5px" >
+          <div id="board-vector-example-2" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-vector-2" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+        <div style="width: 180px; float:left; margin: 5px 5px">
+          <div id="board-vector-example-3" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-vector-3" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+      </div>
+      <div class="caption">Click on any cell of the vector to randomly move the respective queen to a new row.
+        You can also drag and drop queens on the board, but only place a queen on another row of the same column.
+      </div>
+      <script type="module" src="chessboard/chessboard_column_vector_representation.js"></script>
+    </div>
+
+    <a class="marker" href="#permutation-representation"><span>Permutation Representation</span></a>
+    <p id="permutation-representation">
+      Until now, we have either added requirement 3 or 4.
+      Including both of them at the same time, makes the representation just slightly more complicated,
+      but once again helps us to reduce the number of candidate solutions.
+      In terms of a column-vector, this would mean each row index can only be included once.
+      Hence, each column vector is effectively a permutation of row indices.
+      This results in the small number of
+      $$8! = 40320$$
+      candidate solutions. The same can be done for a row-vector, which would include the letters from a to h.
+      Lets try out the permutation vector encoding:
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="text-align: center">Permutation Vector Representation</div>
+        <div style="width: 180px; float:left; margin: 5px 5px">
+          <div id="board-permutation-example-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-permutation-1" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+        <div style="width: 180px; float:left; margin: 5px 5px" >
+          <div id="board-permutation-example-2" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-permutation-2" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+        <div style="width: 180px; float:left; margin: 5px 5px">
+          <div id="board-permutation-example-3" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-permutation-3" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+      </div>
+      <div class="caption">
+        Click on two queens or their respective vector cells to swap their position.
+      </div>
+      <script type="module" src="chessboard/chessboard_permutation_representation.js"></script>
+    </div>
+
+    <a class="marker" href="#comparison"><span>Comparison</span></a>
+    <p id="comparison">
+      Now, we have introduced five representations for the 8-queens problem.
+      Before, we discuss their respective mutation and crossover operators, we will
+      shortly summarize what we have learned so far.
+    </p>
+
+    <p>
+      As we have seen above, the representation defines the search space of our optimization problem.
+      By including a larger number of requirements in our representation, we can reduce the search space
+      to a feasible size, and therefore, speed up the optimization process.
+      So far, we have only used representations that can produce all solutions to our problem.
+      It is also possible to use more restrictive search-spaces, but this can come at the cost of solutions
+      becoming impossible to be found.
+      Below is an overview of the proposed representations, their individual size, and their search spaces.
+    </p>
+    <div>
+      <table style="margin: auto auto">
+        <tr>
+          <th style="width: 150px">Representation</th>
+          <th style="width: 200px">Size of an Individual</th>
+          <th style="width: 250px">Size of the Search Space</th>
+        </tr>
+        <tr>
+          <td>Binary Matrix</td>
+          <td style="text-align:center">$$8 \times 8 = 64$$</td>
+          <td style="text-align:center">$$2^{64} = 18\,446\,744\,073\,709\,551\,616$$</td>
+        </tr>
+        <tr>
+          <td>Constrained Matrix</td>
+          <td style="text-align:center">$$8\times 8 = 64$$</td>
+          <td style="text-align:center">$$\binom{64}{8} = 4\,426\,165\,368$$</td>
+        </tr>
+        <tr>
+          <td>Row Vector</td>
+          <td style="text-align:center">$$8$$</td>
+          <td style="text-align:center">$$8^8 = 16\,777\,216$$</td>
+        </tr>
+        <tr>
+          <td>Column Vector</td>
+          <td style="text-align:center">$$8$$</td>
+          <td style="text-align:center">$$8^8 = 16\,777\,216$$</td>
+        </tr>
+        <tr>
+          <td>Permutation</td>
+          <td style="text-align:center">$$8$$</td>
+          <td style="text-align:center">$$8! = 40320$$</td>
+        </tr>
+      </table>
+    </div>
+
+    <p>
+      We have already seen the different representations in action.
+      Below, we see a comparison of representations and the individuals they can encode.
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: 650px">
+        <div style="transform: rotate(-90deg); float: left;
+                transform-origin: right; margin-top: 75px;
+                margin-right: 10px; font-size: 17px">Row Vector</div>
+        <div style="float:left; width: max-content; margin-top: 57px; margin-left: 10px">
+          <div id="board-comparison-row" class="matrixsmall greyopac" style="width: 19px; height:152px; margin-bottom:5px; margin-left:2px; margin-right:10px; float: left"></div>
+        </div>
+        <div style="width: 160px; float:left; margin: 5px 5px">
+          <div style="width: 152px; text-align: center; font-size: 17px">Permutation Vector</div>
+          <div id="board-comparison-permutation" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+
+          <div id="board-comparison-board" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="board-comparison-column" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+          <div style="width: 152px; text-align: center; font-size: 17px">Column Vector</div>
+        </div>
+        <div style="float: left; margin-top: 55px">
+          <div id="board-comparison-8-queens" class="matrixsmall" style="width: 152px; height: 152px; float: left; margin: auto 10px; margin-bottom: 10px"></div>
+        </div>
+        <div style="transform: rotate(-90deg); float: left;
+                transform-origin: left; margin-top: 190px;
+                margin-left: 10px; font-size: 17px">Constrained Matrix</div>
+      </div>
+      <div class="caption">
+        Drag and drop queens on the board and see how the representations change.
+        In case the current board position cannot be represented using a vector representation,
+        the vector will turn red and be marked with an x.
+      </div>
+      <script type="module" src="chessboard/chessboard_comparison.js"></script>
+    </div>
+
+    <p>
+      After having tried out all representations, please let us know which representation you prefer in terms of usability.
+    <div style="overflow: hidden">
+      <iframe width="620" height="590" src="https://strawpoll.com/embed/o5auuyxco" style="width: 100%; height: 590px; overflow-y: hidden; " frameborder="0" scrolling="no"></iframe>
+    </div>
+    </p>
+
+
+    <h2>Mutation</h2>
+    <p>
+      Mutation is an evolutionary operator that modifies a single individual of our population.
+      It is often used to for a local search in the search space to further exploit a promising solution.
+      This is achieved by adding small changes to a candidate solution, such that the resulting individual
+      is similar to its parent.
+    </p>
+
+    <a class="marker" href="#bit-mutation"><span>Bit Mutation</span></a>
+    <p id="bit-mutation">
+      A simple mutation operator is the <em>bit mutation</em>.
+      For any individual that is represented by a collection of bits, we randomly flip one of them,
+      that is turning a 1 to a 0 or vice versa.
+    </p>
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: 190px; float:left; margin-left:10px;  margin-right:10px">
+          <div id="simple-bit-mutation" class="matrixsmall" style="width: 190px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      Click on any cell of the vector to flip its value.
+    </div>
+
+    <script type="module" src="./chessboard/bit_mutation.js"></script>
+
+    <p>
+      The same operator has been used before, when introducing the matrix representation.
+      Here, you can try it out once more:
+    </p>
+    <div>
+      <div style="overflow: hidden; width:max-content; margin: auto auto">
+        <div id="board-for-matrix-representation-2" style="width: 160px; float: left; margin: auto auto; margin-right: 10px"></div>
+
+        <div id="board-matrix-representation-2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-right:10px; margin-bottom: 10px; margin-left: 10px"></div>
+        <script type="module" src="./chessboard/chessboard_matrix_representation-2.js"></script>
+      </div>
+      <div class="caption">Click on any field of the chessboard or cell in the matrix to toggle a queen.
+        See how the chessboard changes when clicking on the matrix and vice versa.</div>
+    </div>
+
+    <a class="marker" href="#swap-mutation"><span>Swap Mutation</span></a>
+    <p id="swap-mutation">
+      Sadly, this mutation operator does not work for the 8-queens representation.
+      A single bit-flip would either add another 1 or remove one of the many zeros.
+      Thus, violating the requirement to have exactly 8 queens on the board.
+      Therefore, we introduce a second class of mutation operators, the <em>transposition or swap mutation</em>.
+      Instead of choosing a single position to be flipped, we need to choose two positions to be swapped.
+      Once again, this matches the interaction we offered above.
+      Here, you can try out the transposition mutation once more.
+    </p>
+
+    <div class="l-body" style="margin-bottom: 20px">
+      <div style="overflow: hidden; width:max-content; margin: auto auto">
+        <div style="text-align: center">Constrained Matrix Representation</div>
+        <div id="board-8-queens-matrix2" style="width: 160px; float: left; margin: auto auto; margin-bottom: 10px; margin-right: 10px"></div>
+
+        <div id="board-8-queens-matrix-representation2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
+        <script type="module" src="./chessboard/chessboard_8_queens_matrix_representation2.js"></script>
+      </div>
+      <div class="caption">
+        Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
+      </div>
+    </div>
+
+    <a class="marker" href="#value-mutation"><span>Value Mutation</span></a>
+    <p id="value-mutation">
+      Leaving the realm of binary operators, the same concepts can be applied to other number ranges.
+      For this purpose, we need to select a sampling method for the mutation.
+      The simplest choice is a uniform distribution which randomly selects one among all the possible values.
+      See below some examples for various sample spaces.
+    </p>
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: 190px; float:left; margin-left:10px;  margin-right:30px">
+          <div style="text-align: center">Digits</div>
+          <div id="simple-value-mutation-numbers" class="matrixsmall" style="width: 190px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+        <div style="width: 190px; float:left; margin-left:30px;  margin-right:10px">
+          <div style="text-align: center">Characters</div>
+          <div id="simple-value-mutation-characters" class="matrixsmall" style="width: 190px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+        <script type="module" src="./chessboard/value_mutation.js"></script>
+      </div>
+    </div>
+    <div class="caption">
+      Click on any cell of the vector to mutate its value.
+    </div>
+
+    <p>
+      We can use the same concept for row and column-vectors. A row vector's value space consists of the column names $$[a, \ldots, h]$$
+      and a column vector's values represent the row numbers $$[1, \ldots, 8]$$.
+      Both can be tested below:
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: 200px; float:left; margin: 5px 5px; margin-right: 20px">
+          <div style="width: 100%; text-align: center; margin-left: 10px">Row Vector</div>
+          <div id="vector-mutation-2" class="matrixsmall greyopac" style="width: 19px; height:152px; margin-bottom:5px; margin-left:2px; margin-right:10px; float: left"></div>
+          <div id="board-vector-mutation-2" style="width: 160px; margin-bottom:5px; float: left"></div>
+        </div>
+
+        <div style="width: 180px; float:left; margin-left: 20px">
+          <div style="width: 160px; text-align: center; margin-top: 5px">Column Vector</div>
+          <div id="board-vector-mutation-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="vector-mutation-1" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      Click on any cell of the vector to mutate its value and see how the board changes accordingly.
+    </div>
+    <script type="module" src="./chessboard/chessboard_vector_mutation.js"></script>
+
+    <p>
+      Once again, the requirements for the mutation of permutations are a bit special.
+      Since each value can only appear once, we cannot simply replace a value with a random new one.
+      However, swap mutations are still applicable.
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="text-align: center">Permutation Vector</div>
+        <div style="width: max-content; margin-left:auto; margin-right: auto">
+          <div id="board-permutation-example-4" style="width: 160px; margin-bottom:5px;  margin-left:auto; margin-right: auto"></div>
+
+          <div id="board-permutation-4" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left: 10px; margin-right: 10px"></div>
+        </div>
+      </div>
+      <div class="caption">
+        Click on two queens or their respective vector cells to swap their position.
+      </div>
+      <script type="module" src="chessboard/chessboard_permutation_representation2.js"></script>
+    </div>
+
+    <a class="marker" href="#inversion-and-shuffle-mutation"><span>Inversion and Shuffle Mutation</span></a>
+    <p id="inversion-and-shuffle-mutation">
+      More interesting alternatives are the inversion and shuffle mutations.
+      Each operate on a subsequence of the original permutation vector.
+      Similar to the swap mutation, they just reposition existing values but cannot introduce new values to the vector.
+      An inversion mutation inverts the values of the subsequence without moving the subsequence.
+      Finally, the mutations shuffles the values of the subsequence, but keeps the remainder of the permutation as it is.
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: 180px; float:left; margin-left: 20px">
+          <div style="width: 160px; text-align: center; margin-top: 5px; font-size: 17px">Inversion Mutation</div>
+          <div id="board-inversion-mutation-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="inversion-mutation-parent" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+
+          <div id="slider-range-inversion" style="width: 160px; margin-top: 10px; margin-bottom: 10px; margin-left: -3px;"></div>
+
+          <div id="inversion-mutation-child" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+
+          <div id="board-inversion-mutation-2" style="width: 160px; margin-bottom:5px"></div>
+        </div>
+        <div style="width: 180px; float:left; margin-left: 20px">
+          <div style="width: 160px; text-align: center; margin-top: 5px; font-size: 17px">Shuffle Mutation</div>
+          <div id="board-shuffle-mutation-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="shuffle-mutation-parent" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+
+          <div id="slider-range-shuffle" style="width: 160px; margin-top: 10px; margin-bottom: 10px; margin-left: -3px;"></div>
+
+          <div id="shuffle-mutation-child" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
+
+          <div id="board-shuffle-mutation-2" style="width: 160px; margin-bottom:5px"></div>
+        </div>
+      </div>
+      <div class="caption">
+        Click on any cell of the vector to mutate its value and see how the board changes accordingly.
+      </div>
+    </div>
+    <script type="module" src="./chessboard/inversion_shuffle_mutation.js"></script>
+
+    <p>
+      The same can be done for the matrix representations.
+      Here, we would not just swap a single cell, but the whole column or row of the board.
+    </p>
+
+    <h2>Crossover</h2>
+    <p>
+      The crossover is an evolutionary operator that uses two or more candidate solutions to create a new one.
+      The original candidate solutions will be called parents and the resulting individuals will be called childrens respectively.
+      Similar to the mutation operator, a crossover needs to fit the underlying representation of an individual.
+      So far, we have learned about matrix and vector representations and here we will learn some common crossover techniques.
+    </p>
+
+    <a class="marker" href="#1point-crossover"><span>1-Point Crossover</span></a>
+    <p id="1point-crossover">
+      The first and most basic variant is the single-point crossover.
+      Here, we first choose a cutoff point.
+      Elements to the left of this cutoff point will be filled with information from parent 1,
+      whereas elements to the right will be filled with information from parent 2.
+    </p>
+
+    <div>
+      <div style="width: 510px; margin: auto auto">
+        <div style="overflow: hidden">
+          <div style="">
+            <div  id="board-matrix-crossover-1" style="width: 160px; margin-bottom:5px; float: left;"></div>
+            <div class=" matrixsmall redopac active" id="matrix-crossover-1" style="width: 152px;  float: left; margin-bottom:5px;  margin-left:20px; margin-right:20px"></div>
+          </div>
+        </div>
+        <div style="overflow: hidden;">
+          <div style="">
+            <div  id="board-matrix-crossover-2" style="width: 160px; margin-bottom:5px; float: right;"></div>
+            <div class=" matrixsmall blueopac active" id="matrix-crossover-2" style="width: 152px;  float: right; margin-bottom:5px;  margin-left:20px; margin-right:20px"></div>
+          </div>
+        </div>
+        <div style="overflow: hidden; margin: auto auto; width: max-content">
+          <div style="margin: auto auto">
+            <input type="range" min="0" max="8" value="4" class="slider" id="myRangeMatrix" style="width: 171px; margin-left: 5px; margin-right: 5px">
+          </div>
+        </div>
+        <div style="overflow: hidden">
+          <div style="">
+            <div  id="board-matrix-crossover-3" style="width: 160px; margin-bottom:5px; float: left;"></div>
+            <div class=" matrixsmall redopac active" id="matrix-crossover-3" style="width: 152px;  float: left; margin-bottom:5px;  margin-left:20px; margin-right:20px"></div>
+          </div>
+        </div>
+        <div class="caption">
+          Move the slider to shift the cutoff point. See how the child matrix consists of elements of both its parents.
+        </div>
+      </div>
+    </div>
+    <script type="module" src="chessboard/chessboard_matrix_1point_crossover.js"></script>
+
+
+    <p>
+      The same concept can be applied to vector representations.
+      See below, the single-point crossover for the column vector representation.
+    </p>
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: max-content; float:left; margin-left:5px">
+          <div style="text-align: center;  margin-left:2px; margin-right:20px">Parent 1</div>
+          <div id="board-vector-crossover-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="vector-crossover-1" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;  margin-left:2px; margin-right:20px"></div>
+        </div>
+        <div style="width: max-content; float:left" >
+          <div style="text-align: center;  margin-left:20px; margin-right:2px">Parent 2</div>
+          <div id="board-vector-crossover-2" style="width: 160px; margin-bottom:5px; margin-left:20px; margin-right:2px"></div>
+
+          <div id="vector-crossover-2" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;  margin-left:20px; margin-right:2px"></div>
+        </div>
+      </div>
+      <div style="width: max-content; margin: auto auto">
+        <div style="overflow: visible;  margin-top: 20px; margin-left: 15px; margin-right:5px">
+          <div id="vector-crossover-1b" class="matrixsmall redopac" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="vector-crossover-2b" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
+          <input type="range" min="0" max="8" value="4" class="slider" id="myRange" style="width: 171px; margin-left: -10px">
+        </div>
+      </div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content; margin-top:20px">
+        <div style="width:max-content; float:left; margin-right:5px; margin-left:5px">
+          <div id="vector-crossover-3" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px; margin-right: 2px"></div>
+
+          <div id="board-vector-crossover-3" style="width: 160px; margin-bottom:5px"></div>
+          <div style="text-align: center">Child</div>
+        </div>
+      </div>
+      <div class="caption">
+        Move the slider to shift the cutoff point. See how the child changes according to the crossover of its parents.
+      </div>
+    </div>
+    <script type="module" src="chessboard/chessboard_vector_1point_crossover.js"></script>
+
+    <a class="marker" href="#2point-crossover"><span>2-Point Crossover</span></a>
+    <p id="2point-crossover">
+      The two-point crossover uses not just one but two cutoff points.
+      Elements in between both points will be selected from the second parent,
+      whereas elements outside will be picked from parent 1.
+    </p>
+
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: max-content; float:left; margin-left:5px">
+          <div style="text-align: center;  margin-left:2px; margin-right:20px">Parent 1</div>
+          <div id="board-vector-2point-crossover-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="vector-2point-crossover-1" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;  margin-left:2px; margin-right:20px"></div>
+        </div>
+        <div style="width: max-content; float:left" >
+          <div style="text-align: center;  margin-left:20px; margin-right:2px">Parent 2</div>
+          <div id="board-vector-2point-crossover-2" style="width: 160px; margin-bottom:5px; margin-left:20px; margin-right:2px"></div>
+
+          <div id="vector-2point-crossover-2" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;  margin-left:20px; margin-right:2px"></div>
+        </div>
+      </div>
+      <div style="width: max-content; margin: auto auto">
+        <div style="overflow: visible;  margin-top: 20px; margin-left: 15px; margin-right:5px">
+          <div id="vector-2point-crossover-1b" class="matrixsmall redopac" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="vector-2point-crossover-2b" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="myRange2Point" style="width: 160px; margin-top: 10px; margin-bottom: 10px; margin-left: -3px;"></div>
+        </div>
+      </div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content; margin-top:20px">
+        <div style="width:max-content; float:left; margin-right:5px; margin-left:5px">
+          <div id="vector-2point-crossover-3" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px; margin-right: 2px"></div>
+
+          <div id="board-vector-2point-crossover-3" style="width: 160px; margin-bottom:5px"></div>
+          <div style="text-align: center">Child</div>
+        </div>
+      </div>
+      <div class="caption">
+        Move both slider markers to shift the cutoff area. See how the child changes according to the crossover of its parents.
+      </div>
+    </div>
+    <script type="module" src="chessboard/chessboard_vector_2point_crossover.js"></script>
+
+    <a class="marker" href="#uniform-crossover"><span>Uniform Crossover</span></a>
+    <p id="uniform-crossover">
+      We can further generalize the concept by selecting event more cutoff points.
+      A more variable approach is the uniform crossover in which we randomly pick
+      the parent to sample the next element from.
+      Consider throwing a coin for each child element.
+      If head turns up, we sample the element from the first parent,
+      for tail we sample the element from the second parent.
+    </p>
+    <div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: max-content; float:left; margin-left:5px">
+          <div style="text-align: center;  margin-left:2px; margin-right:20px">Parent 1</div>
+          <div id="board-uniform-crossover-1" style="width: 160px; margin-bottom:5px"></div>
+
+          <div id="uniform-crossover-1" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;  margin-left:2px; margin-right:20px"></div>
+        </div>
+        <div style="width: max-content; float:left" >
+          <div style="text-align: center; margin-left:20px; margin-right:2px">Parent 2</div>
+          <div id="board-uniform-crossover-2" style="width: 160px; margin-bottom:5px; margin-left:20px; margin-right:2px"></div>
+
+          <div id="uniform-crossover-2" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;  margin-left:20px; margin-right:2px"></div>
+        </div>
+      </div>
+      <div style="width: max-content; margin: auto auto">
+        <div style="overflow: visible;  margin-top: 20px; margin-right:5px">
+          <div id="uniform-crossover-1b" class="matrixsmall redopac" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="uniform-crossover-2b" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
+        </div>
+      </div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content; margin-top:20px">
+        <div style="width:max-content; float:left; margin-right:5px; margin-left:5px">
+          <div id="uniform-crossover-3" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px; margin-right: 2px"></div>
+
+          <div id="board-uniform-crossover-3" style="width: 160px; margin-bottom:5px"></div>
+          <div style="text-align: center">Child</div>
+        </div>
+      </div>
+      <div class="caption">
+        Click on the parents in the middle to choose which number should be inherited by the child.
+        See how the child changes according to the crossover of its parents.
+      </div>
+    </div>
+    <script type="module" src="chessboard/chessboard_vector_uniform_crossover.js"></script>
+
+    <p>
+      Many crossover methods are not limited to two parents but can be extended to multiple parents.
+      Below we see the three parent uniform crossover.
+    </p>
+
+    <div style="overflow: hidden; margin: auto auto;">
+      <div style="overflow: hidden; margin: auto auto; width: max-content">
+        <div style="width: max-content; float:left; margin-left:5px">
+          <div style="text-align: center;  margin-left:2px; margin-right:20px">Parent 1</div>
+          <div id="board-multi-uniform-crossover-1" style="width: 160px; margin-bottom:5px;  margin-left:2px; margin-right:20px"></div>
+
+          <div id="multi-uniform-crossover-1" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;  margin-left:2px; margin-right:20px"></div>
+        </div>
+        <div style="width: max-content; float:left" >
+          <div style="text-align: center;  margin-left:20px; margin-right:20px">Parent 2</div>
+          <div id="board-multi-uniform-crossover-2" style="width: 160px; margin-bottom:5px;  margin-left:20px; margin-right:20px"></div>
+
+          <div id="multi-uniform-crossover-2" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;  margin-left:20px; margin-right:20px"></div>
+        </div>
+        <div style="width: max-content; float:left" >
+          <div style="text-align: center; margin-left:20px; margin-right:2px">Parent 3</div>
+          <div id="board-multi-uniform-crossover-3" style="width: 160px; margin-bottom:5px; margin-left:20px; margin-right:2px"></div>
+
+          <div id="multi-uniform-crossover-3" class="matrixsmall yellowopac active" style="width: 152px; margin-bottom:5px;  margin-left:20px; margin-right:2px"></div>
+        </div>
+      </div>
+      <div style="width: max-content; margin: auto auto">
+        <div style="overflow: visible;  margin-top: 20px; margin-right:5px">
+          <div id="multi-uniform-crossover-1b" class="matrixsmall redopac" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="multi-uniform-crossover-2b" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="multi-uniform-crossover-3b" class="matrixsmall yellowopac" style="width: 152px; margin-bottom:5px;"></div>
+        </div>
+      </div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content; margin-top:20px">
+        <div style="width:max-content; float:left; margin-right:5px; margin-left:5px">
+          <div id="multi-uniform-crossover-4" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px; margin-right: 2px"></div>
+
+          <div id="board-multi-uniform-crossover-4" style="width: 160px; margin-bottom:5px"></div>
+          <div style="text-align: center">Child</div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      Click on the parents in the middle to choose which number should be inherited by the child.
+      See how the child changes according to the crossover of its parents.
+    </div>
+    <script type="module" src="chessboard/chessboard_vector_multi_parent_uniform_crossover.js"></script>
+
+
+    <a class="marker" href="#cycle-crossover"><span>Cycle Crossover</span></a>
+    <p id="cycle-crossover">
+      All the crossover methods we have seen so far, can be applied to matrix and vector representations.
+      However, they are not suitable for permutations.
+      The cycle crossover is a specialized crossover method which keeps permutations intact.
+    </p>
+
+    <p>
+      Given the vectors of two parents, we first identify the so-called cycles.
+      Therefore, we start with the first value of parent 1 and parent 2.
+      The value of parent 1 will be added to the set of cycle numbers, while
+      the value of parent 2 is the next number we search for in parent 1.
+      Once again, we add the number of parent 1 to the set of cycle numbers and search for
+      the value of parent 2 at the same index in parent 1.
+      This repeats until we have hit a number that is already present in the set of cycle numbers.
+      The found cycle will be removed from both parents and the process
+      repeats until all cycles have been identified.
+      The graphic below shows the process of identifying all cycles.
+    </p>
+    <div>
+      <div style="width: max-content; margin: auto auto">
+        <div style="overflow: visible;  margin-top: 20px; margin-right:5px">
+          <div style="text-align: center">Parents</div>
+          <div id="cycle-crossover-parent-1" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="cycle-crossover-parent-2" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;"></div>
+
+          <div style="text-align: center">Cycle Vector</div>
+          <div id="cycle-crossover-cycle-vector" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="chessboard/chessboard_cycle_identification.js"></script>
+
+    <p>
+      To produce the child vector, we first copy the values of the first cycle of parent 1 to their respective indices in the child vector.
+      Thereafter, we copy the values of the second cycle from parent 2.
+      We repeat this process, by switching between both parents for each consecutive cycle.
+      The graphic below shows the process for producing a child given the cycle vectors.
+    </p>
+
+    <div>
+      <div style="width: max-content; margin: auto auto">
+        <div style="overflow: visible;  margin-top: 20px; margin-right:5px">
+          <div style="text-align: center">Parents</div>
+          <div id="cycle-crossover-parent-1b" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;"></div>
+          <div id="cycle-crossover-parent-2b" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;"></div>
+          <div style="text-align: center">Cycle Vector</div>
+          <div id="cycle-crossover-cycle-vectorb" class="matrixsmall" style="width: 152px; margin-bottom:5px;"></div>
+        </div>
+      </div>
+      <div style="overflow: hidden; margin: auto auto; width: max-content; margin-top:20px">
+        <div style="width:max-content; float:left; margin-right:5px; margin-left:5px">
+          <div style="text-align: center">Child</div>
+          <div id="cycle-crossover-child-vectorb" class="matrixsmall" style="width: 152px; margin-bottom:5px; margin-left:2px; margin-right: 2px"></div>
+
+          <div id="board-cycle-crossover" style="width: 160px; margin-bottom:5px"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="chessboard/chessboard_cycle_crossover_child.js"></script>
+
+
+    <!--
+    <a class="marker" href="#section-1" id="section-1"><span>1</span></a>
+    <h2>A Brief Survey of Techniques</h2>
+    <p>Before diving in: if you haven’t encountered t-SNE before, here’s what you need to know about the math behind it.
+      The goal is to take a set of points in a high-dimensional space and find a faithful representation of those points
+      in a lower-dimensional space, typically the 2D plane. The algorithm is non-linear and adapts to the underlying
+      data, performing different transformations on different regions. Those differences can be a major source of
+      confusion.</p>
+    <p>This is the first paragraph of the article. Test a long&thinsp;&mdash;&thinsp;dash -- here it is.</p>
+    <p>Test for owner's possessive. Test for "quoting a passage." And another sentence. Or two. Some flopping fins; for
+      diving.</p>
+    <aside>Some text in an aside, margin notes, etc...</aside>
+    <p>Here's a test of an inline equation <d-math>c = a^2 + b^2</d-math>. Also with configurable katex standards just
+      using inline '$' signs: $$x^2$$ And then there's a block equation:</p>
+    <d-math block>
+      c = \pm \sqrt{ \sum_{i=0}^{n}{a^{222} + b^2}}
+    </d-math>
+    <p>Math can also be quite involved:</p>
+    <d-math block>
+      \frac{1}{\Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{\frac25 \pi}} = 1+\frac{e^{-2\pi}} {1+\frac{e^{-4\pi}}
+      {1+\frac{e^{-6\pi}} {1+\frac{e^{-8\pi}} {1+\cdots} } } }
+    </d-math>
+    <a class="marker" href="#section-1.1" id="section-1.1"><span>1.1</span></a>
+    <h3>Citations</h3>
+    <p>
+      <d-slider style="width: 200px;"></d-slider>
+    </p>
+    <p>We can<d-cite bibtex-key="mercier2011humans"></d-cite> also cite <d-cite
+        key="gregor2015draw,mercier2011humans,openai2018charter"></d-cite> external publications. <d-cite
+        key="dong2014image,dumoulin2016guide,mordvintsev2015inceptionism"></d-cite>. We should also be testing footnotes
+      <d-footnote>This will become a hoverable footnote. This will become a hoverable footnote. This will become a
+        hoverable footnote. This will become a hoverable footnote. This will become a hoverable footnote. This will
+        become a hoverable footnote. This will become a hoverable footnote. This will become a hoverable footnote.
+      </d-footnote>. There are multiple footnotes, and they appear in the appendix<d-footnote>Given I have coded them
+        right. Also, here's math in a footnote: <d-math>c = \sum_0^i{x}</d-math>. Also, a citation. Box-ception<d-cite
+          key='gregor2015draw'></d-cite>!</d-footnote> as well.</p>
+    <a class="marker" href="#section-2" id="section-2"><span>2</span></a>
+    <h2>Displaying code snippets</h2>
+    <p>Some inline javascript:<d-code language="javascript">var x = 25;</d-code>. And here's a javascript code block.
+    </p>
+    <d-code block language="javascript">
+      var x = 25;
+      function(x){
+      return x * x;
+      }
+    </d-code>
+    <p>We also support python.</p>
+    <d-code block language="python">
+      # Python 3: Fibonacci series up to n
+      def fib(n):
+      a, b = 0, 1
+      while a < n: print(a, end=' ' ) a, b=b, a+b </d-code>
+        <p>And a table</p>
+        <table>
+          <thead>
+            <tr>
+              <th>First</th>
+              <th>Second</th>
+              <th>Third</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>23</td>
+              <td>654</td>
+              <td>23</td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td>54</td>
+              <td>34</td>
+            </tr>
+            <tr>
+              <td>234</td>
+              <td>54</td>
+              <td>23</td>
+            </tr>
+          </tbody>
+        </table>
+        <d-figure id="last-figure"></d-figure>
+        <script>
+          const figure = document.querySelector("d-figure#last-figure");
+          const initTag = document.createElement("span");
+          initTag.textContent = "initialized!"
+          figure.appendChild(initTag);
+          figure.addEventListener("ready", function () {
+            const initTag = figure.querySelector("span");
+            initTag.textContent = "ready"
+            console.log('ready')
+          });
+          figure.addEventListener("onscreen", function () {
+            const initTag = figure.querySelector("span");
+            initTag.textContent = "onscreen"
+            console.log('onscreen')
+          });
+          figure.addEventListener("offscreen", function () {
+            const initTag = figure.querySelector("span");
+            initTag.textContent = "offscreen!"
+            console.log('offscreen')
+          });
+        </script>
+        <p>That's it for the example article!</p>
+    -->
+  </d-article>
+
+  <d-appendix>
+
+    <h3>Contributions</h3>
+    <p>Some text describing who did what.</p>
+    <h3>Reviewers</h3>
+    <p>Some text with links describing who reviewed the article.</p>
+
+    <d-bibliography src="bibliography.bib"></d-bibliography>
+  </d-appendix>
+
+  <distill-footer></distill-footer>
+
+</body>
