@@ -16,16 +16,15 @@
 <!doctype html>
 
 <head>
-  <script src="../dist/template.v2.js"></script>
+  <script src="dist/template.v2.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf8">
-
-  <link rel="stylesheet" href="./chessboard/chessboard.css">
-  <script type="text/javascript" src="../lib/jquery-3.5.1.js"></script>
+  <link rel="stylesheet" href="chessboard/chessboard.css">
+  <script type="text/javascript" src="jquery-3.5.1.js"></script>
   <script type="text/javascript" src="chessboard/chessboard.js"></script>
 
-  <link rel="stylesheet" href="../lib/jquery-ui-1.12.1.custom/jquery-ui.min.css">
-  <script src="../lib/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="jquery-ui-1.12.1.custom/jquery-ui.min.css">
+  <script src="jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
 </head>
 
 <body>
@@ -165,7 +164,7 @@
         such that no two queens share the same row, column or diagonal. Queens that threaten each other
         will be highlighted in red. In case you found a solution all queens will be highlighted in green.</div>
     </div>
-    <script type="module" src="./chessboard/chessboard_lets_play.js"></script>
+    <script type="module" src="chessboard/chessboard_lets_play.js"></script>
 
 
     <h2>Representation</h2>
@@ -197,7 +196,7 @@
         <div id="board-for-matrix-representation" style="width: 160px; float: left; margin: auto auto; margin-right: 10px"></div>
 
         <div id="board-matrix-representation" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
-        <script type="module" src="./chessboard/chessboard_matrix_representation.js"></script>
+        <script type="module" src="chessboard/chessboard_matrix_representation.js"></script>
       </div>
       <div class="caption">Click on any field of the chessboard or cell in the matrix to toggle a queen.
         See how the chessboard changes when clicking on the matrix and vice versa.</div>
@@ -228,7 +227,7 @@
         <div id="board-8-queens-matrix" style="width: 160px; float: left; margin: auto auto; margin-bottom: 10px; margin-right: 10px"></div>
 
         <div id="board-8-queens-matrix-representation" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
-        <script type="module" src="./chessboard/chessboard_8_queens_matrix_representation.js"></script>
+        <script type="module" src="chessboard/chessboard_8_queens_matrix_representation.js"></script>
       </div>
       <div class="caption">
         Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
@@ -471,7 +470,7 @@
       Click on any cell of the vector to flip its value.
     </div>
 
-    <script type="module" src="./chessboard/bit_mutation.js"></script>
+    <script type="module" src="chessboard/bit_mutation.js"></script>
 
     <p>
       The same operator has been used before, when introducing the matrix representation.
@@ -482,7 +481,7 @@
         <div id="board-for-matrix-representation-2" style="width: 160px; float: left; margin: auto auto; margin-right: 10px"></div>
 
         <div id="board-matrix-representation-2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-right:10px; margin-bottom: 10px; margin-left: 10px"></div>
-        <script type="module" src="./chessboard/chessboard_matrix_representation-2.js"></script>
+        <script type="module" src="chessboard/chessboard_matrix_representation-2.js"></script>
       </div>
       <div class="caption">Click on any field of the chessboard or cell in the matrix to toggle a queen.
         See how the chessboard changes when clicking on the matrix and vice versa.</div>
@@ -505,7 +504,7 @@
         <div id="board-8-queens-matrix2" style="width: 160px; float: left; margin: auto auto; margin-bottom: 10px; margin-right: 10px"></div>
 
         <div id="board-8-queens-matrix-representation2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
-        <script type="module" src="./chessboard/chessboard_8_queens_matrix_representation2.js"></script>
+        <script type="module" src="chessboard/chessboard_8_queens_matrix_representation2.js"></script>
       </div>
       <div class="caption">
         Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
@@ -529,7 +528,7 @@
           <div style="text-align: center">Characters</div>
           <div id="simple-value-mutation-characters" class="matrixsmall" style="width: 190px; margin-bottom:5px; margin-left:2px"></div>
         </div>
-        <script type="module" src="./chessboard/value_mutation.js"></script>
+        <script type="module" src="chessboard/value_mutation.js"></script>
       </div>
     </div>
     <div class="caption">
@@ -561,7 +560,7 @@
     <div class="caption">
       Click on any cell of the vector to mutate its value and see how the board changes accordingly.
     </div>
-    <script type="module" src="./chessboard/chessboard_vector_mutation.js"></script>
+    <script type="module" src="chessboard/chessboard_vector_mutation.js"></script>
 
     <p>
       Once again, the requirements for the mutation of permutations are a bit special.
@@ -624,7 +623,7 @@
         Click on any cell of the vector to mutate its value and see how the board changes accordingly.
       </div>
     </div>
-    <script type="module" src="./chessboard/inversion_shuffle_mutation.js"></script>
+    <script type="module" src="chessboard/inversion_shuffle_mutation.js"></script>
 
     <p>
       The same can be done for the matrix representations.
