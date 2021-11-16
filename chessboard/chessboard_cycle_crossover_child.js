@@ -6,13 +6,17 @@ let boards = initializeBoards([
 ]);
 
 // initialize crossover result
-let vector1 = createVector(random_permutation(), "#cycle-crossover-parent-1b");
-let vector2 = createVector(random_permutation(), "#cycle-crossover-parent-2b");
-let cycle_vector = createVector(random_permutation(), "#cycle-crossover-cycle-vectorb");
+let vector1 = createVector([1, 3, 6, 4, 8, 7, 2, 5], "#cycle-crossover-parent-1b");
+let vector2 = createVector([4, 2, 1, 6, 7, 3, 8, 5], "#cycle-crossover-parent-2b");
+let cycle_vector = createVector(["","","","","","","",""], "#cycle-crossover-cycle-vectorb");
 let divsParent1 = $(vector1).find("div");
 let divsParent2 = $(vector2).find("div");
 let divsChild = $("#cycle-crossover-child-vectorb").find("div");
 let divsCycles = $(cycle_vector).find("div");
+
+let step = 0;
+let step_description = []
+let cycles = []
 
 //updateVectors(rangeInput.getAttribute("value"), divsParent1, divsParent2);
 cycle_detection(divsParent1, divsParent2, divsCycles);
@@ -21,7 +25,6 @@ updateChild(divsParent1, divsParent2, divsCycles, divsChild, boards[0]);
 function cycle_detection(divsParent1, divsParent2, divsCycles){
     let parent1 = [];
     let parent2 = [];
-    let cycles = [];
     for (let i = 0; i < 8; i++){
         parent1[i] = parseInt(divsParent1[i].innerHTML);
         parent2[i] = parseInt(divsParent2[i].innerHTML);
@@ -32,7 +35,6 @@ function cycle_detection(divsParent1, divsParent2, divsCycles){
     for (let i = 0; i < 8; i++){
         if (cycles[i] === 0){
             let cycle_indices = get_cycle_indices(i, parent1, parent2);
-            console.log(cycle_indices);
             for (let index in cycle_indices)
             {
                 cycles[cycle_indices[index]] = cycleNumber;
@@ -51,11 +53,12 @@ function get_cycle_indices(start_index, parent1, parent2){
     let current_value = null;
     let current_index = start_index;
     while (true){
-        current_value = parent2[current_index];
-        current_index = parent1.indexOf(current_value);
+        current_value = parent1[current_index];
+        current_index = parent2.indexOf(current_value);
 
-        if (current_index === start_index)
+        if (current_index === start_index) {
             return cycle_indices;
+        }
 
         cycle_indices = cycle_indices.concat([current_index]);
     }

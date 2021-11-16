@@ -33,12 +33,12 @@
     <script id='distill-front-matter' type="text/json">{
     "title": "Choosing Representation, Mutation, and Crossover in Evolutionary Algorithms",
     "description": "Learn how the choice of representation affects your evolutionary algorithm.",
-    "published": "Dec 31, 2020",
+    "published": "Nov 26, 2021",
     "authors": [
       {
         "author":"Alexander Dockhorn",
         "authorURL":"https://adockhorn.github.io/",
-        "affiliations": [{"name": "Queen Mary University London"}]
+        "affiliations": [{"name": "Otto von Guericke University Magdeburg"}]
       },
       {
         "author":"Simon Lucas",
@@ -56,7 +56,7 @@
   </d-front-matter>
   <d-title>
     <p>An interactive article on solving the 8-Queens problem.
-      Learn how the choice of representation affects the other components of your evolutionary algorithm.</p>
+      Learn how the choice of representation affects your evolutionary algorithm.</p>
   </d-title>
   <d-byline></d-byline>
   <d-article id="root">
@@ -98,7 +98,7 @@
 
         //sort them in order of appearance
         elements.sort((a, b) => a["index"] - b["index"]);
-        console.log(elements);
+        //console.log(elements);
 
         //console.log("nToCEntries: " + tocItems.length);
         var i;
@@ -106,7 +106,7 @@
         for (i = 0; i < elements.length; i++) {
           var item = elements[i]["element"];
           if (item.tagName === "H2") {
-            console.log("h2");
+            //console.log("h2");
             //item.style.backgroundColor = "#EEEEEE";
             let entry = document.createElement("div");
             let link = document.createElement("a");
@@ -120,7 +120,7 @@
             toc.appendChild(entry);
           }
           else {
-            console.log("marker");
+            //console.log("marker");
             let list = document.createElement("ul");
             list.style.marginBottom = "unset";
             let entry = document.createElement("li");
@@ -151,8 +151,8 @@
     </p>
 
     <p>
-      The mapping between genotype and phenotype plays an important part in the algorithm design process.
-      In this article, we will present EA design concepts based on a discussion of the 8-Queens problem.
+      The mapping between genotype and phenotype plays an important part in the algorithm's design.
+      In this article, we will present design concepts based on a discussion of the 8-Queens problem.
       This seemingly simple puzzle requires you to place eight queens on an $$8\times8$$ chessboard so
       that no two queens threaten each other. Thus, no two queens share the same row, column or diagonal.
       Do you think you are up to the task? Go ahead and try it yourself:
@@ -175,8 +175,8 @@
     <ol>
       <li>a chessboard offers 64 fields arranged in an $$8\times8$$ grid</li>
       <li>the solution consists of exactly 8 queens</li>
-      <li>each row can include only one queen, otherwise they would threaten each other</li>
-      <li>each column can include only one queen, otherwise they would threaten each other</li>
+      <li id="prop_3">each row can include only one queen, otherwise they would threaten each other</li>
+      <li id="prop_3">each column can include only one queen, otherwise they would threaten each other</li>
       <li>each diagonal can include only one queen, otherwise they would threaten each other</li>
     </ol>
 
@@ -186,8 +186,7 @@
       Just considering the first requirement may spawn some ideas already.
       Lets consider a chessboard to be an $$8\times8$$ binary matrix in which a 0 encodes an empty field and a 1 a field
       with a queen on it.
-      Test how this encoding works by by clicking on either a field of the chessboard or the cells of the matrix
-      to remove or add a queen at the clicked position.
+      You can test this encoding below.
     </p>
     <div>
       <div style="overflow: hidden; width:max-content; margin: auto auto">
@@ -202,11 +201,11 @@
         See how the chessboard changes when clicking on the matrix and vice versa.</div>
     </div>
 
-    <p>
+    <p style="margin-top: 20px">
       This encoding can produce any possible queen placement of 0 to 64 queens on a regular chessboard.
       Hence, the solution to this puzzle will be included in the set of encodable phenotypes.
       Sadly, it also lets us create many candidates that violate the other requirements.
-      Using this representation, we can produce quite a lot different candidates. In total there are:
+      Using this representation, we can produce a lot of different candidates. In total there are:
     </p>
 
     <d-math block>
@@ -216,10 +215,10 @@
     <a class="marker" href="#constrained-matrix-representation"><span>Constrained Matrix Representation</span></a>
     <p id="constrained-matrix-representation">
       Honestly, this might be a bit much to find one of the 92 solutions.
-      But we can easily improve on this by adding the second requirement to our encoding, namely no solution can have more or less than 8 queens.
+      But we can easily improve this by adding the second property to constrain our encoding, namely that no solution can have more or less than 8 queens.
       Therefore, we need to limit the number of queens in our matrix to exactly 8.
-      If you tried to find a solution yourself, you have already used a similar encoding above.
-      Once again, lets try out the drag on drop approach for moving queens and see how it influences our encoding.
+      This time, our genotype corresponds to moving a queen on the board, because they can neither be spawned nor removed from the board.
+      In case you tried to find a solution yourself at the beginning of this article, you have already used a similar phenotype representation above.
     </p>
     <div class="l-body" style="margin-bottom: 20px">
       <div style="overflow: hidden; width:max-content; margin: auto auto">
@@ -235,9 +234,8 @@
     </div>
 
     <p>
-      This seems to be a small but intuitive change.
-      Nevertheless, it has a massive impact on the number of possible solutions.
-      Instead of $$2^{64}$$ it can produce only:
+      While this seems to be a small but intuitive change, it has a massive impact on the number of possible solutions.
+      Instead of $$2^{64}$$ it can only produce:
       $$\binom{64}{8} = 4\,426\,165\,368$$
     </p>
 
@@ -245,9 +243,8 @@
     <p id="row-vector-representation">
       So far, we have incorporated the first two requirements in our encoding.
       We can do even better by adding the constraints on rows, columns, and diagonals to it.
-      Lets consider an even more condensed representation using requirement 3.
-      Since each row can contain only a single queen, we can use a vector of size 8 to encode the column each queen is placed at.
-      Lets try how this works:
+      Let us consider an even more compressed representation by adding the third property, according to which each row can contain only a single queen.
+      Therefore, we can use a vector of size 8 to encode the column in which each queen is located.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -266,24 +263,24 @@
         </div>
       </div>
       <div class="caption">Click on any cell of the vector to randomly move the respective queen to a new column.
-        You can also drag and drop queens on the board, but only place a queen on another column of the same row.
+        Alternatively, you can drag and drop queens on the board along the x-axis.
+        Note, that queens cannot be moved to another row since this is forbidden in our encoding.
       </div>
       <script type="module" src="chessboard/chessboard_row_vector_representation.js"></script>
     </div>
-    <p>
-      This might reduce the usability a bit, but the computer will probably have less problems with this issue.
-      In fact, the reduction to even less candidate solutions can drastically speed-up the time until a solution is found.
+    <p style="margin-top: 20px">
+      This might reduce usability for a human user, but the computer will have less problems with this.
+      In fact, the reduction to even less candidate solutions can drastically speed up the time until a solution is found.
       Implementing a row-vector encoding results in even less candidate solutions:
       $$8^8 = 16\,777\,216$$
     </p>
 
     <a class="marker" href="#column-vector-representation"><span>Column Vector Representation</span></a>
     <p id="column-vector-representation">
-      An interesting details of the 8-Queens problem is its symmetry.
+      An interesting detail of the 8-Queens problem is its symmetry.
       This means a valid solution may be mirrored and rotated to produce new solutions.
-      The same symmetry can be found in the two requirements 3 and 4.
-      Hence, we could have implemented a column-vector encoding instead of a row-vector.
-      Go ahead and see how the column-vector representation works:
+      The same symmetry can be found in the two properties <a href="#prop_3">three</a> and <a href="#prop_4">four</a>.
+      Hence, we could have implemented a column-vector encoding instead of using a row-vector.
     </p>
 
     <div>
@@ -306,22 +303,23 @@
         </div>
       </div>
       <div class="caption">Click on any cell of the vector to randomly move the respective queen to a new row.
-        You can also drag and drop queens on the board, but only place a queen on another row of the same column.
+        Alternatively, you can drag and drop queens on the board, but only place a queen on another row of the same column.
+        Note, that due to the genotype's constraints, queens cannot be moved to another column.
       </div>
       <script type="module" src="chessboard/chessboard_column_vector_representation.js"></script>
     </div>
 
-    <a class="marker" href="#permutation-representation"><span>Permutation Representation</span></a>
+    <a class="marker" href="#permutation-representation"><span style="margin-top: 20px">Permutation Representation</span></a>
     <p id="permutation-representation">
-      Until now, we have either added requirement 3 or 4.
-      Including both of them at the same time, makes the representation just slightly more complicated,
+      Until now, we have either added property 3 or 4.
+      Including both of them at the same time, makes the representation slightly more complicated,
       but once again helps us to reduce the number of candidate solutions.
       In terms of a column-vector, this would mean each row index can only be included once.
       Hence, each column vector is effectively a permutation of row indices.
       This results in the small number of
       $$8! = 40320$$
-      candidate solutions. The same can be done for a row-vector, which would include the letters from a to h.
-      Lets try out the permutation vector encoding:
+      candidate solutions.
+      The same can be done for a row-vector, which would include a permutation of the letters from $$a$$ to $$h$$.
     </p>
 
     <div>
@@ -349,9 +347,9 @@
       <script type="module" src="chessboard/chessboard_permutation_representation.js"></script>
     </div>
 
-    <a class="marker" href="#comparison"><span>Comparison</span></a>
+    <a class="marker" href="#comparison"><span style="margin-top: 20px">Comparison of Representations</span></a>
     <p id="comparison">
-      Now, we have introduced five representations for the 8-queens problem.
+      Up to now, we have introduced five representations for the 8-queens problem.
       Before, we discuss their respective mutation and crossover operators, we will
       shortly summarize what we have learned so far.
     </p>
@@ -369,8 +367,8 @@
       <table style="margin: auto auto">
         <tr>
           <th style="width: 150px">Representation</th>
-          <th style="width: 200px">Size of an Individual</th>
-          <th style="width: 250px">Size of the Search Space</th>
+          <th style="width: 250px; text-align: center">Size of an Individual</th>
+          <th style="width: 250px; text-align: center">Size of the Search Space</th>
         </tr>
         <tr>
           <td>Binary Matrix</td>
@@ -400,7 +398,7 @@
       </table>
     </div>
 
-    <p>
+    <p style="margin-top: 20px">
       We have already seen the different representations in action.
       Below, we see a comparison of representations and the individuals they can encode.
     </p>
@@ -437,19 +435,19 @@
       <script type="module" src="chessboard/chessboard_comparison.js"></script>
     </div>
 
-    <p>
+    <!--<p>
       After having tried out all representations, please let us know which representation you prefer in terms of usability.
     <div style="overflow: hidden">
       <iframe width="620" height="590" src="https://strawpoll.com/embed/o5auuyxco" style="width: 100%; height: 590px; overflow-y: hidden; " frameborder="0" scrolling="no"></iframe>
     </div>
-    </p>
+    </p>-->
 
 
     <h2>Mutation</h2>
     <p>
       Mutation is an evolutionary operator that modifies a single individual of our population.
-      It is often used to for a local search in the search space to further exploit a promising solution.
-      This is achieved by adding small changes to a candidate solution, such that the resulting individual
+      It is often used for a local exploration of the search space to further exploit a promising solution.
+      This is achieved by making small changes to a candidate solution so that the resulting individual
       is similar to its parent.
     </p>
 
@@ -457,7 +455,7 @@
     <p id="bit-mutation">
       A simple mutation operator is the <em>bit mutation</em>.
       For any individual that is represented by a collection of bits, we randomly flip one of them,
-      that is turning a 1 to a 0 or vice versa.
+      therefore, turning a $$1$$ to a $$0$$ or vice versa.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -474,7 +472,6 @@
 
     <p>
       The same operator has been used before, when introducing the matrix representation.
-      Here, you can try it out once more:
     </p>
     <div>
       <div style="overflow: hidden; width:max-content; margin: auto auto">
@@ -487,45 +484,21 @@
         See how the chessboard changes when clicking on the matrix and vice versa.</div>
     </div>
 
-    <a class="marker" href="#swap-mutation"><span>Swap Mutation</span></a>
-    <p id="swap-mutation">
-      Sadly, this mutation operator does not work for the 8-queens representation.
-      A single bit-flip would either add another 1 or remove one of the many zeros.
-      Thus, violating the requirement to have exactly 8 queens on the board.
-      Therefore, we introduce a second class of mutation operators, the <em>transposition or swap mutation</em>.
-      Instead of choosing a single position to be flipped, we need to choose two positions to be swapped.
-      Once again, this matches the interaction we offered above.
-      Here, you can try out the transposition mutation once more.
-    </p>
-
-    <div class="l-body" style="margin-bottom: 20px">
-      <div style="overflow: hidden; width:max-content; margin: auto auto">
-        <div style="text-align: center">Constrained Matrix Representation</div>
-        <div id="board-8-queens-matrix2" style="width: 160px; float: left; margin: auto auto; margin-bottom: 10px; margin-right: 10px"></div>
-
-        <div id="board-8-queens-matrix-representation2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
-        <script type="module" src="chessboard/chessboard_8_queens_matrix_representation2.js"></script>
-      </div>
-      <div class="caption">
-        Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
-      </div>
-    </div>
-
-    <a class="marker" href="#value-mutation"><span>Value Mutation</span></a>
+    <a class="marker" href="#value-mutation"><span style="margin-top: 20px">Value Mutation</span></a>
     <p id="value-mutation">
-      Leaving the realm of binary operators, the same concepts can be applied to other number ranges.
+      Leaving the realm of binary operators behind, we explore how the same concepts can be applied to other value ranges.
       For this purpose, we need to select a sampling method for the mutation.
       The simplest choice is a uniform distribution which randomly selects one among all the possible values.
-      See below some examples for various sample spaces.
+      See below some examples for various sample spaces and how to mutate them.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
         <div style="width: 190px; float:left; margin-left:10px;  margin-right:30px">
-          <div style="text-align: center">Digits</div>
+          <div style="text-align: center">Digits $$[0, 1, ..., 9]$$</div>
           <div id="simple-value-mutation-numbers" class="matrixsmall" style="width: 190px; margin-bottom:5px; margin-left:2px"></div>
         </div>
         <div style="width: 190px; float:left; margin-left:30px;  margin-right:10px">
-          <div style="text-align: center">Characters</div>
+          <div style="text-align: center">Characters $$\{a, b, ..., z\}$$</div>
           <div id="simple-value-mutation-characters" class="matrixsmall" style="width: 190px; margin-bottom:5px; margin-left:2px"></div>
         </div>
         <script type="module" src="chessboard/value_mutation.js"></script>
@@ -536,8 +509,8 @@
     </div>
 
     <p>
-      We can use the same concept for row and column-vectors. A row vector's value space consists of the column names $$[a, \ldots, h]$$
-      and a column vector's values represent the row numbers $$[1, \ldots, 8]$$.
+      We can use the same concept for row and column-vectors. A row vector's value space consists of the column names $$\{a, \ldots, h\}$$
+      while a column vector's values include the row numbers $$[1, \ldots, 8]$$.
       Both can be tested below:
     </p>
 
@@ -562,11 +535,36 @@
     </div>
     <script type="module" src="chessboard/chessboard_vector_mutation.js"></script>
 
-    <p>
-      Once again, the requirements for the mutation of permutations are a bit special.
-      Since each value can only appear once, we cannot simply replace a value with a random new one.
-      However, swap mutations are still applicable.
+    <p style="margin-top: 20px">
+      Finally, the permutation vector needs some special attention.
+      Since each value of the vector can only be used once, we cannot simply replace a value with a random new one.
+      However, we can introduce a new class of mutations, that is suitable for permutations.
     </p>
+
+    <a class="marker" href="#swap-mutation"><span>Transposition and Swap Mutations</span></a>
+    <p id="swap-mutation">
+      The binary and value mutation operators do not work for the constrained matrix representation.
+      A single bit-flip would either add another one or remove one of the many zeros.
+      Thus, violating the constraint of having exactly 8 queens on the board.
+      Similarly, any singular value mutation to a permutation representation, will cause an invalid vector.
+      Therefore, we introduce another class of mutations called the <em>transposition or swap mutation</em>.
+      Instead of choosing a single position to be randomly changed, we need to choose at least two positions to be rearranged.
+      Below, you can try out a swap mutation for the constrained matrix representation, that has already been featured above.
+    </p>
+
+    <div class="l-body" style="margin-bottom: 20px">
+      <div style="overflow: hidden; width:max-content; margin: auto auto">
+        <div style="text-align: center">Constrained Matrix Representation</div>
+        <div id="board-8-queens-matrix2" style="width: 160px; float: left; margin: auto auto; margin-bottom: 10px; margin-right: 10px"></div>
+
+        <div id="board-8-queens-matrix-representation2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
+        <script type="module" src="chessboard/chessboard_8_queens_matrix_representation2.js"></script>
+      </div>
+      <div class="caption">
+        Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
+      </div>
+    </div>
+
 
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -583,13 +581,14 @@
       <script type="module" src="chessboard/chessboard_permutation_representation2.js"></script>
     </div>
 
-    <a class="marker" href="#inversion-and-shuffle-mutation"><span>Inversion and Shuffle Mutation</span></a>
+    <a class="marker" href="#inversion-and-shuffle-mutation"><span style="margin-top: 20px">Inversion and Shuffle Mutation</span></a>
     <p id="inversion-and-shuffle-mutation">
-      More interesting alternatives are the inversion and shuffle mutations.
-      Each operate on a subsequence of the original permutation vector.
+      More interesting versions of a transposition mutation include the inversion mutation and shuffle mutation.
+      Each operate on a subsequence of the original vector.
       Similar to the swap mutation, they just reposition existing values but cannot introduce new values to the vector.
-      An inversion mutation inverts the values of the subsequence without moving the subsequence.
-      Finally, the mutations shuffles the values of the subsequence, but keeps the remainder of the permutation as it is.
+      An inversion mutation inverts the values of a chosen subsequence without moving the subsequence.
+      In contrast, the shuffle mutation randomly reorders the values of a chosen subsequence, but keeps the remainder of the vector as it is.
+      Both of these operators keep a permutation vector intact and can also be applied to less restrictive genotypes.
     </p>
 
     <div>
@@ -620,20 +619,70 @@
         </div>
       </div>
       <div class="caption">
-        Click on any cell of the vector to mutate its value and see how the board changes accordingly.
+        Use the sliders to set the range on which the mutation should be applied to.
+        The updated subsequence will be highlighted in red.
+        Note, how the shuffle mutation can produce different outcomes for the same subsequence.
       </div>
     </div>
     <script type="module" src="chessboard/inversion_shuffle_mutation.js"></script>
 
-    <p>
-      The same can be done for the matrix representations.
-      Here, we would not just swap a single cell, but the whole column or row of the board.
+    <p style="margin-top: 20px">
+      Inversion an shuffle mutations can also be implemented for matrix representations and other type of encodings.
+      In case of a matrix, we would invert or shuffle a set of cells to rearrange the board.
     </p>
+
+    <a class="marker" href="#comparison-mutation"><span>Comparison of Mutation Operators</span></a>
+    <p id="comparison-mutation">
+      Many more mutation operators can be found, but those discussed above will suffice in the context of the 8-Queens problem.
+      To shortly summarize discussed mutation operators, we prepared an overview in terms of their determinism after the target index/indices have been selected and
+      their ability to preserve a permutation, below.
+    </p>
+    <div >
+      <table style="margin: auto auto">
+        <tr>
+          <th style="width: 150px">Mutation Operator</th>
+          <th style="width: 100px; text-align: center">Deterministic Result</th>
+          <th style="width: 100px; text-align: center">Permutation Preserving</th>
+        </tr>
+        <tr>
+          <td>Binary Mutation</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+          <td style="text-align:center">$$\times$$</td>
+        </tr>
+        <tr>
+          <td>Value Mutation</td>
+          <td style="text-align:center">$$\times$$</td>
+          <td style="text-align:center">$$\times$$</td>
+        </tr>
+        <tr>
+          <td>Swap Mutation</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+        </tr>
+        <tr>
+          <td>Inversion Mutation</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+        </tr>
+        <tr>
+          <td>Shuffle Mutation</td>
+          <td style="text-align:center">$$\times$$</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin-top: 20px">
+      Despite that, the mutation operator is one component to locally search the space around promising solution candidates.
+      The next section will discuss another type of genetic operator that is often used in conjunction with mutation.
+    </p>
+
+
 
     <h2>Crossover</h2>
     <p>
       The crossover is an evolutionary operator that uses two or more candidate solutions to create a new one.
-      The original candidate solutions will be called parents and the resulting individuals will be called childrens respectively.
+      The original candidate solutions will be called parents and the resulting individuals will be called children, respectively.
       Similar to the mutation operator, a crossover needs to fit the underlying representation of an individual.
       So far, we have learned about matrix and vector representations and here we will learn some common crossover techniques.
     </p>
@@ -714,7 +763,7 @@
         </div>
       </div>
       <div class="caption">
-        Move the slider to shift the cutoff point. See how the child changes according to the crossover of its parents.
+        Move the slider to shift the cutoff point. See how the child vector changes according to the crossover of its parents.
       </div>
     </div>
     <script type="module" src="chessboard/chessboard_vector_1point_crossover.js"></script>
@@ -723,7 +772,7 @@
     <p id="2point-crossover">
       The two-point crossover uses not just one but two cutoff points.
       Elements in between both points will be selected from the second parent,
-      whereas elements outside will be picked from parent 1.
+      whereas elements outside will be picked from the first.
     </p>
 
     <div>
@@ -764,7 +813,7 @@
 
     <a class="marker" href="#uniform-crossover"><span>Uniform Crossover</span></a>
     <p id="uniform-crossover">
-      We can further generalize the concept by selecting event more cutoff points.
+      We can further generalize the concept by selecting even more cutoff points.
       A more variable approach is the uniform crossover in which we randomly pick
       the parent to sample the next element from.
       Consider throwing a coin for each child element.
@@ -865,15 +914,12 @@
 
     <p>
       Given the vectors of two parents, we first identify the so-called cycles.
-      Therefore, we start with the first value of parent 1 and parent 2.
-      The value of parent 1 will be added to the set of cycle numbers, while
-      the value of parent 2 is the next number we search for in parent 1.
-      Once again, we add the number of parent 1 to the set of cycle numbers and search for
-      the value of parent 2 at the same index in parent 1.
-      This repeats until we have hit a number that is already present in the set of cycle numbers.
-      The found cycle will be removed from both parents and the process
-      repeats until all cycles have been identified.
-      The graphic below shows the process of identifying all cycles.
+      Therefore, we start with the first value of parent 1 and search for it occurrence in parent 2.
+      Once we found the value in parent 2, we use the value of parent 1 at the same index to once again search for it in parent 2.
+      This process is repeated until we get back to the first index of parent 1.
+      All indices visited will be added to the first cycle.
+      We repeat this process with the next value not yet sorted into a cycle, until all values have been assigned to a cycle.
+      The graphic below shows the process of identifying all cycles in a given permutation.
     </p>
     <div>
       <div style="width: max-content; margin: auto auto">
@@ -882,21 +928,30 @@
           <div id="cycle-crossover-parent-1" class="matrixsmall redopac active" style="width: 152px; margin-bottom:5px;"></div>
           <div id="cycle-crossover-parent-2" class="matrixsmall blueopac active" style="width: 152px; margin-bottom:5px;"></div>
 
+          <div style="margin: 0 auto; width: fit-content">
+          <input type="button" id="cycle-start" value="<<">
+          <input type="button" id="cycle-back" value="<">
+          <input type="button" id="cycle-next" value=">">
+          <input type="button" id="cycle-end" value=">>">
+          </div>
           <div style="text-align: center">Cycle Vector</div>
           <div id="cycle-crossover-cycle-vector" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
         </div>
       </div>
+      <div style="text-align: left; height:3.5em">Description: <span id="cycle-identification-text"></span></div>
+      <div class="caption">
+        Click on the buttons in the middle to step through the iterations of the cycle identification algorithm.
+      </div>
     </div>
     <script type="module" src="chessboard/chessboard_cycle_identification.js"></script>
 
-    <p>
-      To produce the child vector, we first copy the values of the first cycle of parent 1 to their respective indices in the child vector.
-      Thereafter, we copy the values of the second cycle from parent 2.
-      We repeat this process, by switching between both parents for each consecutive cycle.
+    <p style="margin-top: 20px">
+      To produce the child vector, we copy the values of all odd cycles from parent 1 to their respective indices in the child vector.
+      Thereafter, we copy the values all even cycles from parent 2.
       The graphic below shows the process for producing a child given the cycle vectors.
     </p>
 
-    <div>
+    <div style="margin-bottom: 20px">
       <div style="width: max-content; margin: auto auto">
         <div style="overflow: visible;  margin-top: 20px; margin-right:5px">
           <div style="text-align: center">Parents</div>
@@ -917,6 +972,52 @@
     </div>
     <script type="module" src="chessboard/chessboard_cycle_crossover_child.js"></script>
 
+    <a class="marker" href="#comparison-crossover"><span>Comparison of Crossover Operators</span></a>
+    <p>
+      This ends our overview of crossover operators. Similar to mutation operators, we can find many more specialized examples in the literature.
+      Nevertheless, the presented selection will suffice to efficiently solve the 8-Queens problem.
+      To summarize discussed crossover operators, we once again take a look at each operator's determinism (after selecting the respective cutoff-points or intervals) and preservation of permutations, below.
+    </p>
+    <div >
+      <table style="margin: auto auto">
+        <tr>
+          <th style="width: 150px">Crossover Operator</th>
+          <th style="width: 100px; text-align: center">Deterministic Result</th>
+          <th style="width: 100px; text-align: center">Permutation Preserving</th>
+        </tr>
+        <tr>
+          <td>1-Point Crossover</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+          <td style="text-align:center">$$\times$$</td>
+        </tr>
+        <tr>
+          <td>2-Point Crossover</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+          <td style="text-align:center">$$\times$$</td>
+        </tr>
+        <tr>
+          <td>Uniform Crossover</td>
+          <td style="text-align:center">$$\times$$</td>
+          <td style="text-align:center">$$\times$$</td>
+        </tr>
+        <tr>
+          <td>Cycle Crossover</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+          <td style="text-align:center">$$\checkmark$$</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Conclusion</h2>
+    <p>
+      In this paper, we introduced several representations and their respective mutation and crossover operators for solving the 8-Queens Puzzle.
+      We have shown how the choice of representation impacts the size of the search space and the choice of genetic operators.
+      Special attention has been given to permutation preserving mutation and crossover operators.
+      This overview has not covered all aspects of the algorithm's design process.
+      Further elements such as initialization of the first population, fitness evaluation, selection and reproduction should be well thought of when implementing an EA.
+      For this purpose, we refer to further introductory literature on EAs<d-cite bibtex-key="Kruse2016"></d-cite> as well as more detailed selections of mutation<d-cite bibtex-key="back2000mutation"></d-cite> and crossover operators<d-cite bibtex-key="AJ2015"></d-cite> can help to better understand the EA design process.
+    </p>
+    <!--
     <h2>Available features</h2>
     <p>This is an example of citing other articles<d-cite bibtex-key="radford2015unsupervised"></d-cite>
 
@@ -936,7 +1037,6 @@
       while a < n: print(a, end=' ' ) a, b=b, a+b
     </d-code>
 
-    <!--
     <a class="marker" href="#section-1" id="section-1"><span>1</span></a>
     <h2>A Brief Survey of Techniques</h2>
     <p>Before diving in: if you haven’t encountered t-SNE before, here’s what you need to know about the math behind it.
@@ -1042,12 +1142,6 @@
   </d-article>
 
   <d-appendix>
-
-    <h3>Contributions</h3>
-    <p>Some text describing who did what.</p>
-    <h3>Reviewers</h3>
-    <p>Some text with links describing who reviewed the article.</p>
-
     <d-bibliography src="bibliography.bib"></d-bibliography>
   </d-appendix>
 
