@@ -214,6 +214,20 @@
     background-color: #e2aebb;
 }
 
+.greenopac div{
+    background-color: #c7dec7;
+}
+
+.greenopac div.active:nth-child(-2n+8),
+.greenopac div.active:nth-child(8) ~ div.active:nth-child(-2n+15),
+.greenopac div.active:nth-child(16) ~ div.active:nth-child(-2n+24),
+.greenopac div.active:nth-child(24) ~ div.active:nth-child(-2n+31),
+.greenopac div.active:nth-child(32) ~ div.active:nth-child(-2n+40),
+.greenopac div.active:nth-child(40) ~ div.active:nth-child(-2n+47),
+.greenopac div.active:nth-child(48) ~ div.active:nth-child(-2n+56),
+.greenopac div.active:nth-child(56) ~ div.active:nth-child(-2n+63) {
+    background-color: darkseagreen;
+}
 
 .redopac div.inactive:nth-child(n){
     background-color: #ffffff;

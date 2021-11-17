@@ -38,11 +38,14 @@ $( function() {
         slide: function( event, ui ) {
             if (ui.values[0] === ui.values[1])
                 return false;
-            console.log(ui.values);
+            //console.log(ui.values);
             updateVectorsShuffle(ui.values, divsParentShuffle, divsChildShuffle, boards[2], boards[3]);
         }
     });
 } );
+
+boards[1].position(boards[0].position())
+boards[3].position(boards[2].position())
 
 updateVectorsInversion([ 3, 5 ], divsParentInversion, divsChildInversion, boards[0], boards[1]);
 updateVectorsShuffle([ 3, 5 ], divsParentShuffle, divsChildShuffle, boards[2], boards[3]);
@@ -50,27 +53,41 @@ updateVectorsShuffle([ 3, 5 ], divsParentShuffle, divsChildShuffle, boards[2], b
 
 function updateVectorsInversion(values, divsParent, divsChild, boardParent, boardChild){
     //retrieve the x first elements
-    let newVector = [];
+    let newVectorChild = position_to_column_vector(boardChild.position());
+    let newVector = position_to_column_vector(boardParent.position());
+
     for (let i = 0; i < 8; i++) {
-        newVector[i] = 8-parseInt(divsParent[i].innerHTML);
         divsChild[i].innerHTML = divsParent[i].innerHTML;
         divsChild[i].style.backgroundColor = null;
     }
 
-    for (let i = 0; i < (values[1]-values[0]); i++){
-        newVector[values[0] + i] = 8-parseInt(divsParent[values[1]-(i+1)].innerHTML);
-        divsChild[values[0] +i].innerHTML = divsParent[values[1]-(i+1)].innerHTML;
-        divsChild[values[0] + i].style.backgroundColor = "mistyrose";
+    for (let i = 0; i < 8; i++){
+
+        if (i < values[0] || i >= values[1])
+        {
+            boardChild.move(index_to_col_name[i]+(newVectorChild[i]) + "-" + index_to_col_name[i]+(newVector[i]));
+        }
+        else
+        {
+            let j = i - values[0];
+            boardChild.move(index_to_col_name[values[0]+j]+(newVectorChild[values[0]+j]) + "-" + index_to_col_name[values[0]+j]+(newVector[values[1]-(j+1)]));
+
+            //newVector[values[0] + i] = shuffleValues[i];
+            divsChild[i].innerHTML = newVector[values[1]-(j+1)];
+            divsChild[i].style.backgroundColor = "mistyrose";
+        }
     }
 
-    boardChild.position(column_vector_to_position(newVector));
+    //boardChild.position(column_vector_to_position(newVector));
 }
 
 function updateVectorsShuffle(values, divsParent, divsChild, boardParent, boardChild){
     //retrieve the x first elements
-    let newVector = [];
+    let newVectorChild = position_to_column_vector(boardChild.position());
+    let newVector = position_to_column_vector(boardParent.position());
+
     for (let i = 0; i < 8; i++) {
-        newVector[i] = 8-parseInt(divsParent[i].innerHTML);
+        //newVectorChild[i] = parseInt(divsChild[i].innerHTML);
         divsChild[i].innerHTML = divsParent[i].innerHTML;
         divsChild[i].style.backgroundColor = null;
     }
@@ -78,13 +95,22 @@ function updateVectorsShuffle(values, divsParent, divsChild, boardParent, boardC
     let shuffleValues = newVector.slice(values[0], values[1]);
     shuffle(shuffleValues);
 
-    for (let i = 0; i < (values[1]-values[0]); i++){
-        newVector[values[0] + i] = shuffleValues[i];
-        divsChild[values[0] +i].innerHTML = 8-shuffleValues[i];
-        divsChild[values[0] + i].style.backgroundColor = "mistyrose";
-    }
+    let posTemp = boardChild.position();
+    for (let i = 0; i < 8; i++){
+        if (i < values[0] || i >= values[1])
+        {
+            boardChild.move(index_to_col_name[i]+(newVectorChild[i]) + "-" + index_to_col_name[i]+(newVector[i]));
+        }
+        else
+        {
+            let j = i - values[0];
+            boardChild.move(index_to_col_name[values[0]+j]+(newVectorChild[values[0]+j]) + "-" + index_to_col_name[values[0]+j]+(shuffleValues[j]));
 
-    boardChild.position(column_vector_to_position(newVector));
+            //newVector[values[0] + i] = shuffleValues[i];
+            divsChild[i].innerHTML = shuffleValues[j];
+            divsChild[i].style.backgroundColor = "mistyrose";
+        }
+    }
 }
 
 

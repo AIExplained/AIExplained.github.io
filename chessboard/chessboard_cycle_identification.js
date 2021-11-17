@@ -15,7 +15,7 @@ let step_description = []
 let cycles = []
 cycle_detection(divsParent1, divsParent2, divsCycles);
 
-console.log(step_description)
+//console.log(step_description)
 
 let startbutton = $("#cycle-start");
 let backbutton = $("#cycle-back");
@@ -73,8 +73,8 @@ for (let i = 1; i < 8; i++){
 }
 
 function update_description(){
-    console.log(step);
-    console.log(step_description[step]);
+    //console.log(step);
+    //console.log(step_description[step]);
 
     description.innerHTML = step_description[step];
 
@@ -108,7 +108,7 @@ function cycle_detection(divsParent1, divsParent2, divsCycles){
         if (cycles[i] === 0){
             step_description = step_description.concat("Start new cycle at index " + (i+1) + ". Search for value " + parent1[i] + " in Parent 2. ")
             let cycle_indices = get_cycle_indices(i, parent1, parent2);
-            console.log(cycle_indices);
+            //console.log(cycle_indices);
             step_description = step_description.concat("Value "+ parent1[cycle_indices.at(-1)] + " found at index "+ (i+1) + ". Cycle " + (cycleNumber) + " complete. Mark cycle indices in cycle vector.")
             for (let index in cycle_indices)
             {
