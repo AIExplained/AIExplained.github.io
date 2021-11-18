@@ -344,6 +344,16 @@ export const example_positions = [
         e5: "bQ",
         e4: "bQ"
     },
+    {
+        a6: "bQ",
+        b5: "bQ",
+        c2: "bQ",
+        d8: "bQ",
+        e3: "bQ",
+        f4: "bQ",
+        g1: "bQ",
+        h7: "bQ"
+    },
 ];
 
 

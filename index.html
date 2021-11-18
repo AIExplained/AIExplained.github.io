@@ -152,7 +152,7 @@
 
     <p>
       The mapping between genotype and phenotype plays an important part in the algorithm's design.
-      In this article, we will present design concepts based on a discussion of the 8-Queens problem.
+      In this article, we will present design concepts based on a discussion of the 8-Queens problem<d-cite bibtex-key="Rivin1994"></d-cite>.
       This seemingly simple puzzle requires you to place eight queens on an $$8\times8$$ chessboard so
       that no two queens threaten each other. Thus, no two queens share the same row, column or diagonal.
       Do you think you are up to the task? Go ahead and try it yourself:
@@ -160,7 +160,7 @@
     </div>
     <div class="l-body" style="margin-bottom: 20px">
       <div id="board-letsplay" style="width: 320px; margin: auto auto; margin-bottom: 10px"></div>
-      <div class="caption">Drag and drop queens to change their position. Try to position all queens
+      <div class="caption"><b>Figure 1:</b> Introducing the 8-Queens problem. Drag and drop queens to change their position. Try to position all queens
         such that no two queens share the same row, column or diagonal. Queens that threaten each other
         will be highlighted in red. In case you found a solution all queens will be highlighted in green.</div>
     </div>
@@ -197,7 +197,7 @@
         <div id="board-matrix-representation" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-left:10px; margin-right:10px; margin-bottom: 10px"></div>
         <script type="module" src="chessboard/chessboard_matrix_representation.js"></script>
       </div>
-      <div class="caption">Click on any field of the chessboard or cell in the matrix to toggle a queen.
+      <div class="caption"><b>Figure 2:</b> Pheno- and genotype matrix representation of the 8-Queens problem. Click on any field of the chessboard or cell in the matrix to toggle a queen.
         See how the chessboard changes when clicking on the matrix and vice versa.</div>
     </div>
 
@@ -229,7 +229,7 @@
         <script type="module" src="chessboard/chessboard_8_queens_matrix_representation.js"></script>
       </div>
       <div class="caption">
-        Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
+        <b>Figure 3:</b> Pheno- and genotype constrained matrix representation of the 8-Queens problem. Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
       </div>
     </div>
 
@@ -262,7 +262,7 @@
           <div id="board-row-vector-example-3" style="width: 160px; margin-bottom:5px; float: left"></div>
         </div>
       </div>
-      <div class="caption">Click on any cell of the vector to randomly move the respective queen to a new column.
+      <div class="caption"><b>Figure 4:</b> Pheno- and genotype row vector representation of the 8-Queens problem. Click on any cell of the vector to randomly move the respective queen to a new column.
         Alternatively, you can drag and drop queens on the board along the x-axis.
         Note, that queens cannot be moved to another row since this is forbidden in our encoding.
       </div>
@@ -302,7 +302,7 @@
           <div id="board-vector-3" class="matrixsmall greyopac" style="width: 152px; margin-bottom:5px; margin-left:2px"></div>
         </div>
       </div>
-      <div class="caption">Click on any cell of the vector to randomly move the respective queen to a new row.
+      <div class="caption"><b>Figure 5:</b> Pheno- and genotype column vector representation of the 8-Queens problem. Click on any cell of the vector to randomly move the respective queen to a new row.
         Alternatively, you can drag and drop queens on the board, but only place a queen on another row of the same column.
         Note, that due to the genotype's constraints, queens cannot be moved to another column.
       </div>
@@ -342,7 +342,7 @@
         </div>
       </div>
       <div class="caption">
-        Click on two queens or their respective vector cells to swap their position.
+        <b>Figure 6:</b> Pheno- and genotype permutation vector representation of the 8-Queens problem. Click on two queens or their respective vector cells to swap their position.
       </div>
       <script type="module" src="chessboard/chessboard_permutation_representation.js"></script>
     </div>
@@ -364,6 +364,9 @@
       Below is an overview of the proposed representations, their individual size, and their search spaces.
     </p>
     <div>
+      <div class="caption">
+        <b>Table 1:</b> Comparison of genotype representations and their resulting size of the search space.
+      </div>
       <table style="margin: auto auto">
         <tr>
           <th style="width: 150px">Representation</th>
@@ -428,7 +431,7 @@
                 margin-left: 10px; font-size: 17px">Constrained Matrix</div>
       </div>
       <div class="caption">
-        Drag and drop queens on the board and see how the representations change.
+        <b>Figure 7:</b> Comparison of genotype representations of the 8-Queens problem. Drag and drop queens on the board and see how the representations change.
         In case the current board position cannot be represented using a vector representation,
         the vector will turn red and be marked with an x.
       </div>
@@ -465,12 +468,11 @@
       </div>
     </div>
     <div class="caption">
-      Click on any cell of the vector to flip its value.
+      <b>Figure 8:</b> Bit mutation for a binary vector. Click on any cell of the vector to flip its value.
     </div>
-
     <script type="module" src="chessboard/bit_mutation.js"></script>
 
-    <p>
+    <p style="margin-top: 20px">
       The same operator has been used before, when introducing the matrix representation.
     </p>
     <div>
@@ -480,7 +482,8 @@
         <div id="board-matrix-representation-2" class="matrixsmall" style="width: 152px; float: right; margin: auto auto; margin-right:10px; margin-bottom: 10px; margin-left: 10px"></div>
         <script type="module" src="chessboard/chessboard_matrix_representation-2.js"></script>
       </div>
-      <div class="caption">Click on any field of the chessboard or cell in the matrix to toggle a queen.
+      <div class="caption"><b>Figure 9:</b> Bit mutation for a matrix-based representation of the 8-Queens problem.
+        Click on any field of the chessboard or cell in the matrix to toggle a queen.
         See how the chessboard changes when clicking on the matrix and vice versa.</div>
     </div>
 
@@ -505,10 +508,10 @@
       </div>
     </div>
     <div class="caption">
-      Click on any cell of the vector to mutate its value.
+      <b>Figure 10:</b> Click on any cell of the vector to mutate its value.
     </div>
 
-    <p>
+    <p style="margin-top: 20px">
       We can use the same concept for row and column-vectors. A row vector's value space consists of the column names $$\{a, \ldots, h\}$$
       while a column vector's values include the row numbers $$[1, \ldots, 8]$$.
       Both can be tested below:
@@ -531,7 +534,7 @@
       </div>
     </div>
     <div class="caption">
-      Click on any cell of the vector to mutate its value and see how the board changes accordingly.
+      <b>Figure 11:</b> Value mutation for vector-based representations of the 8-queens problem. Click on any cell of the vector to mutate its value and see how the board changes accordingly.
     </div>
     <script type="module" src="chessboard/chessboard_vector_mutation.js"></script>
 
@@ -561,6 +564,7 @@
         <script type="module" src="chessboard/chessboard_8_queens_matrix_representation2.js"></script>
       </div>
       <div class="caption">
+        <b>Figure 12:</b> Swap mutation for the constrained matrix representation of the 8 Queens problem.
         Drag and drop queens to change their position. See how the matrix changes according to the changes on the board.
       </div>
     </div>
@@ -576,6 +580,7 @@
         </div>
       </div>
       <div class="caption">
+        <b>Figure 13:</b> Swap mutation for the permutation vector representation of the 8 Queens problem.
         Click on two queens or their respective vector cells to swap their position.
       </div>
       <script type="module" src="chessboard/chessboard_permutation_representation2.js"></script>
@@ -619,6 +624,7 @@
         </div>
       </div>
       <div class="caption">
+        <b>Figure 14:</b> Inversion and shuffle mutation for vector-based representations of the 8-Queens problems.
         Use the sliders to set the range on which the mutation should be applied to.
         The updated subsequence will be highlighted in red.
         Note, how the shuffle mutation can produce different outcomes for the same subsequence.
@@ -627,7 +633,7 @@
     <script type="module" src="chessboard/inversion_shuffle_mutation.js"></script>
 
     <p style="margin-top: 20px">
-      Inversion an shuffle mutations can also be implemented for matrix representations and other type of encodings.
+      Inversion and shuffle mutations can also be implemented for matrix representations and other type of encodings.
       In case of a matrix, we would invert or shuffle a set of cells to rearrange the board.
     </p>
 
@@ -638,6 +644,9 @@
       their ability to preserve a permutation, below.
     </p>
     <div >
+      <div class="caption">
+        <b>Table 2:</b> Comparison of mutation operators based on determinism and their ability to preserve permutations.
+      </div>
       <table style="margin: auto auto">
         <tr>
           <th style="width: 150px">Mutation Operator</th>
@@ -721,7 +730,7 @@
           </div>
         </div>
         <div class="caption">
-          Move the slider to shift the cutoff point. See how the child matrix consists of elements of both its parents.
+          <b>Figure 15:</b> Visualization of a 1-point crossover between two matrices. Move the slider to shift the cutoff point. See how the child matrix consists of elements of both its parents.
         </div>
       </div>
     </div>
@@ -763,7 +772,7 @@
         </div>
       </div>
       <div class="caption">
-        Move the slider to shift the cutoff point. See how the child vector changes according to the crossover of its parents.
+        <b>Figure 16:</b> Visualization of a 1-point crossover between two vectors. Move the slider to shift the cutoff point. See how the child vector changes according to the crossover of its parents.
       </div>
     </div>
     <script type="module" src="chessboard/chessboard_vector_1point_crossover.js"></script>
@@ -806,6 +815,7 @@
         </div>
       </div>
       <div class="caption">
+        <b>Figure 17:</b> Visualization of a 2-point crossover between two vectors.
         Move both slider markers to shift the cutoff area. See how the child changes according to the crossover of its parents.
       </div>
     </div>
@@ -850,7 +860,7 @@
         </div>
       </div>
       <div class="caption">
-        Click on the parents in the middle to choose which number should be inherited by the child.
+        <b>Figure 18:</b> Visualization of a uniform crossover between two vectors. Click on the parents in the middle to choose which number should be inherited by the child.
         See how the child changes according to the crossover of its parents.
       </div>
     </div>
@@ -899,7 +909,7 @@
       </div>
     </div>
     <div class="caption">
-      Click on the parents in the middle to choose which number should be inherited by the child.
+      <b>Figure 19:</b> Visualization of a 2-point crossover between three vectors. Click on the parents in the middle to choose which number should be inherited by the child.
       See how the child changes according to the crossover of its parents.
     </div>
     <script type="module" src="chessboard/chessboard_vector_multi_parent_uniform_crossover.js"></script>
@@ -919,7 +929,7 @@
       This process is repeated until we get back to the first index of parent 1.
       All indices visited will be added to the first cycle.
       We repeat this process with the next value not yet sorted into a cycle, until all values have been assigned to a cycle.
-      The graphic below shows the process of identifying all cycles in a given permutation.
+      The figure below shows the process of identifying all cycles in a given permutation.
     </p>
     <div>
       <div style="width: max-content; margin: auto auto">
@@ -938,8 +948,9 @@
           <div id="cycle-crossover-cycle-vector" class="matrixsmall blueopac" style="width: 152px; margin-bottom:5px;"></div>
         </div>
       </div>
-      <div style="text-align: left; height:3.5em">Description: <span id="cycle-identification-text"></span></div>
+      <div style="text-align: left; height:3.5em; font-size: smaller">Description: <span id="cycle-identification-text"></span></div>
       <div class="caption">
+        <b>Figure 20:</b> Determining the cycle vector given two permutations.
         Click on the buttons in the middle to step through the iterations of the cycle identification algorithm.
       </div>
     </div>
@@ -947,8 +958,8 @@
 
     <p style="margin-top: 20px">
       To produce the child vector, we copy the values of all odd cycles from parent 1 to their respective indices in the child vector.
-      Thereafter, we copy the values all even cycles from parent 2.
-      The graphic below shows the process for producing a child given the cycle vectors.
+      Thereafter, we copy the values of all even cycles from parent 2 into the child vector.
+      The figure below shows the result from the example above.
     </p>
 
     <div style="margin-bottom: 20px">
@@ -969,6 +980,9 @@
           <div id="board-cycle-crossover" style="width: 160px; margin-bottom:5px"></div>
         </div>
       </div>
+      <div class="caption">
+        <b>Figure 21:</b> Determining the child vector given the two parents and their respective cycle vector.
+      </div>
     </div>
     <script type="module" src="chessboard/chessboard_cycle_crossover_child.js"></script>
 
@@ -979,6 +993,9 @@
       To summarize discussed crossover operators, we once again take a look at each operator's determinism (after selecting the respective cutoff-points or intervals) and preservation of permutations, below.
     </p>
     <div >
+      <div class="caption">
+        <b>Table 3:</b> Comparison of crossover operators based on their determinism and their ability to preserve permutations.
+      </div>
       <table style="margin: auto auto">
         <tr>
           <th style="width: 150px">Crossover Operator</th>
@@ -1102,6 +1119,9 @@
 
           <div id="vec-solution-12" class="matrixsmall greenopac active" style="width: 152px; margin-bottom:5px;  margin-left:2px; margin-right:20px"></div>
         </div>
+      </div>
+      <div class="caption">
+        <b>Figure 22:</b> Overview of the 12 unique solutions for the 8-Queens problem.
       </div>
     </div>
     <script type="module" src="chessboard/chessboard_solutions.js"></script>

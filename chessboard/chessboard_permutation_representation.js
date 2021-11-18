@@ -5,7 +5,7 @@ import {col_name_to_index} from "./chessboard_utils.js";
 initializeBoards([
     ["board-permutation-example-1", "#board-permutation-1", example_positions[0]],
     ["board-permutation-example-2", "#board-permutation-2", example_positions[2]],
-    ["board-permutation-example-3", "#board-permutation-3", example_positions[0]]
+    ["board-permutation-example-3", "#board-permutation-3", example_positions[6]]
 ]);
 
 function initializeBoards(boardContainers){
