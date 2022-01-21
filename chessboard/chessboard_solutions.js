@@ -28,7 +28,7 @@ function initializeSolutions(boardContainers, solutions){
         let boardContainer = boardContainers[i][0];
         let vectorContainer = boardContainers[i][1];
         let solution = solutions[i];
-        console.log(column_vector_to_position(solution))
+        //console.log(column_vector_to_position(solution))
 
         //console.log(boardContainer);
         let board = Chessboard(boardContainer, {
@@ -39,7 +39,6 @@ function initializeSolutions(boardContainers, solutions){
         if (board === null)
             console.log(boardContainer);
         let table = createVector(position_to_column_vector(board.position()), vectorContainer);
-        $("div", table).click(function(){ mutateQueen(this, board);});
         boards[i] = board;
 
         highlightCollisions($("#" + boardContainer), board.position());

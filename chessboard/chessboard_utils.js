@@ -231,6 +231,12 @@ export function highlightCollisions($board, position, threatcssclass="highlight-
     }
 }
 
+export function highlightPosition($board, positions, threatcssclass="highlight-red") {
+    for (let pos in positions){
+        $board.find('.' + squareClass+".square-"+pos).addClass(threatcssclass)
+    }
+}
+
 /**
  *
  * @param fieldname

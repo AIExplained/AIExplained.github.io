@@ -22,6 +22,9 @@
             user-select: none;
 }
 
+.square-55d63 >  {
+
+}
 .white-1e1d7 {
   background-color: #f0d9b5;
   color: #b58863;
@@ -149,15 +152,19 @@
 }
 .matrixsmall div {
     float: left;
-    width: 19px;
-    height: 19px;
-    line-height: 19px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
     background-color: #fff;
     border-color: #000;
     text-align: center;
     #border-style: solid;
     #border-width: 1px;
     vertical-align: middle;
+}
+
+.matrixsmall div > div > div > img {
+    transform: translate(0px, 2px);
 }
 
 
@@ -353,4 +360,58 @@
 :global(d-contents nav>div>a:hover,
     d-contents nav>ul>li>a:hover) {
   text-decoration: none;
+}
+
+
+
+details {
+    width: 100%;
+    margin: 0px auto ;
+    background: #e5e5e5;
+    margin-bottom: .5rem;
+    box-shadow: 0 .1rem 1rem -.5rem rgba(182, 182, 182, 0.4);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+summary {
+    padding: 0.5rem;
+    display: block;
+    background: #cccccc;
+    padding-left: 2.2rem;
+    position: relative;
+    cursor: pointer;
+}
+
+summary:before {
+    content: '';
+    border-width: .4rem;
+    border-style: solid;
+    border-color: transparent transparent transparent #fff;
+    position: absolute;
+    top: 0.85rem;
+    left: 1rem;
+    transform: rotate(0);
+    transform-origin: .2rem 50%;
+    transition: .25s transform ease;
+}
+
+summary > p {
+    margin: 10px auto;
+
+}
+
+/* THE MAGIC 🧙‍♀️ */
+details[open] > summary:before {
+    transform: rotate(90deg);
+}
+
+
+details summary::-webkit-details-marker {
+    display:none;
+}
+
+details > ul {
+    padding-bottom: 1rem;
+    margin-bottom: 0;
 }
