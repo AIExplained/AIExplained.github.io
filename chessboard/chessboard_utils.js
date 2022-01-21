@@ -180,6 +180,28 @@ export function position_to_binary_board(position){
     return [binary_board, unsafe_positions, safe_positions];
 }
 
+export function getSafeAndUnsafePosition(binary_board) {
+    let unsafe_positions = [];
+    let safe_positions = [];
+    let i = 0;
+    let j = 0;
+    let position = binary_board_to_position(binary_board)
+
+    for (let pos in position) {
+        let row = 8 - parseInt(pos[1]);
+        let col = col_name_to_index[pos[0]];
+        if (!isSafe(binary_board, row, col)){
+            unsafe_positions[i] = pos;
+            i++;
+        } else {
+            safe_positions[j] = pos;
+            j++;
+        }
+    }
+
+    return [unsafe_positions, safe_positions];
+}
+
 
 /**
  *
@@ -191,7 +213,7 @@ export function binary_board_to_position(binary_board){
     for(let i=0; i<8; i++){
 
         for(let j=0; j<8; j++){
-            if (binary_board[i][j]==="1"){
+            if (binary_board[i][j]==="1" || binary_board[i][j]===1){
                 let row = 8-j;
                 let column = index_to_col_name[i];
                 position[column+row] = "bQ";

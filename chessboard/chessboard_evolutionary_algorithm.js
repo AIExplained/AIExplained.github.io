@@ -1,6 +1,7 @@
 import {highlightCollisions, example_positions, position_to_binary_board} from "./chessboard_utils.js";
 import {RowVectorIndividual, validateRowVectorIndividual} from "./rowVectorIndiduals.js"
 import {ColumnVectorIndividual, validateColumnVectorIndividual} from "./columnVectorIndividuals.js"
+import {ConstrainedMatrixIndividual, validateConstrainedMatrixIndividual} from "./constrainedMatrixIndividuals.js"
 
 let board = Chessboard('board-ea-test', {
     draggable: false,
@@ -16,7 +17,7 @@ position_to_binary_board(board.position());
 document.getElementById("awesome").addEventListener("click", doStuff);
 
 function doStuff(){
-    //validateColumnVectorIndividual()
+    //validateConstrainedMatrixIndividual()
 
     let representationName = $('#select_representation').find(":selected").text();
     let mutationName = $('#select_mutation').find(":selected").text();
@@ -133,7 +134,7 @@ function initializePopulation(populationsize, representationName, mutationName, 
     for (let i = 0; i < populationsize; i++){
         switch (representationName){
             default:
-                population[i] = new ColumnVectorIndividual(mutationName, crossoverName);
+                population[i] = new ConstrainedMatrixIndividual(mutationName, crossoverName);
                 break;
         }
     }
@@ -150,8 +151,3 @@ class PermutationVectorIndividual {
 
 }
 
-//---------------------------------------------
-
-class ConstrainedMatrixIndividual {
-
-}
