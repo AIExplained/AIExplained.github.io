@@ -2,6 +2,7 @@ import {highlightCollisions, example_positions, position_to_binary_board} from "
 import {RowVectorIndividual, validateRowVectorIndividual} from "./rowVectorIndiduals.js"
 import {ColumnVectorIndividual, validateColumnVectorIndividual} from "./columnVectorIndividuals.js"
 import {ConstrainedMatrixIndividual, validateConstrainedMatrixIndividual} from "./constrainedMatrixIndividuals.js"
+import {PermutationIndividual, validatePermutationIndividual} from "./permutationIndividual.js"
 
 let board = Chessboard('board-ea-test', {
     draggable: false,
@@ -17,13 +18,14 @@ position_to_binary_board(board.position());
 document.getElementById("awesome").addEventListener("click", doStuff);
 
 function doStuff(){
-    //validateConstrainedMatrixIndividual()
+    //validatePermutationIndividual()
+
 
     let representationName = $('#select_representation').find(":selected").text();
     let mutationName = $('#select_mutation').find(":selected").text();
     let crossoverName = $('#select_crossover').find(":selected").text();
 
-    let repetitions = 10;
+    let repetitions = 1000;
     let solvedRuns = 0;
     let totalGenerations = 0;
     for (let i = 0; i < repetitions; i++){
@@ -32,6 +34,8 @@ function doStuff(){
         totalGenerations += result[1];
     }
     console.log(representationName, mutationName, crossoverName, solvedRuns, totalGenerations/repetitions);
+
+
 
 }
 
@@ -133,21 +137,23 @@ function initializePopulation(populationsize, representationName, mutationName, 
     let population = []
     for (let i = 0; i < populationsize; i++){
         switch (representationName){
-            default:
+            case "Constrained Matrix":
                 population[i] = new ConstrainedMatrixIndividual(mutationName, crossoverName);
+                break;
+            case "Row Vector":
+                population[i] = new RowVectorIndividual(mutationName, crossoverName);
+                break;
+            case "Column Vector":
+                population[i] = new ColumnVectorIndividual(mutationName, crossoverName);
+                break;
+            case "Permutation Vector":
+                population[i] = new PermutationIndividual(mutationName, crossoverName);
+                break;
+            default:
                 break;
         }
     }
     return population
 }
 
-
-// INDIVIDUALS
-
-
-//---------------------------------------------
-
-class PermutationVectorIndividual {
-
-}
 
