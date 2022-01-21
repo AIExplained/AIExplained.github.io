@@ -138,6 +138,46 @@
         }
       })
     </script>
+    <div id="evo_alg_test">
+      <div class="box" style="display: flex; justify-content: center">
+        <div style="width: 200px">
+          <label for="select_representation">Select a Representation</label>
+          <select name="representation" id="select_representation" style="width: 180px">
+            <option>Constrained Matrix</option>
+            <option>Row Vector</option>
+            <option selected="selected">Column Vector</option>
+            <option>Permutation Vector</option>
+          </select>
+        </div>
+        <div style="width: 200px">
+          <label for="select_mutation">Select a Mutation</label>
+          <select name="mutation" id="select_mutation" style="width: 180px">
+            <option>Value Mutation</option>
+            <option>Swap Mutation</option>
+            <option selected="selected">Shuffle Mutation</option>
+            <option>Inversion Mutation</option>
+          </select>
+        </div>
+        <div style="width: 200px">
+          <label for="select_crossover">Select a Crossover</label>
+          <select name="crossover" id="select_crossover" style="width: 180px">
+            <option selected="selected">1-Point Crossover</option>
+            <option>2-Point Crossover</option>
+            <option>Uniform Crossover (p=0.5)</option>
+            <option>Cycle Crossover</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="awesome">Click here when you are awesome</button>
+
+
+      <div class="l-body" style="margin-bottom: 20px">
+        <div id="board-ea-test" style="width: 320px; margin: auto auto; margin-bottom: 10px"></div>
+        <div class="caption"><b>Figure 1:</b> Testing the EA.</div>
+      </div>
+      <script type="module" src="chessboard/chessboard_evolutionary_algorithm.js"></script>
+    </div>
     <div>
     <p>
       Evolutionary algorithms (EAs) can be used to solve plenty of tasks using the power of evolutionary optimization.
