@@ -23,8 +23,8 @@
   <script type="text/javascript" src="jquery-3.5.1.js"></script>
   <script type="text/javascript" src="chessboard/chessboard.js"></script>
 
-  <link rel="stylesheet" href="jquery-ui-1.12.1.custom/jquery-ui.min.css">
-  <script src="jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="jquery-ui-1.13.1.custom/jquery-ui.min.css">
+  <script src="jquery-ui-1.13.1.custom/jquery-ui.min.js"></script>
 </head>
 
 <body>
@@ -169,13 +169,71 @@
         </div>
       </div>
 
-      <button id="awesome">Click here when you are awesome</button>
-
+      <div class="box" style="display: flex; margin-left: -20px; margin-top:20px; margin-bottom:1em; justify-content: center;">
+        <button id="awesome" style="width: 200px">Run Evolutionary Algorithm</button>
+      </div>
+      <div class="box" style="display: flex; margin-left: -20px; margin-top:20px; margin-bottom:1em; justify-content: center;">
+        <button id="even_more_awesome" style="width: 200px">Run All</button>
+      </div>
 
       <div class="l-body" style="margin-bottom: 20px">
-        <div id="board-ea-test" style="width: 320px; margin: auto auto; margin-bottom: 10px"></div>
+        <div id="success" class="ui-state-error ui-corner-all" style="display: none; margin-top: 20px; padding: 0 .7em; padding-top: 1em; margin-bottom: 1em;
+            border: 1px solid #5eda78; background: #90ff9e; color: #105a16;">
+          <p>Found a solution after xxx generations.</p>
+        </div>
+        <div id="alert" class="ui-state-error ui-corner-all" style="display: none; margin-top: 20px; padding: 0 .7em; padding-top: 1em; margin-bottom: 1em">
+          <p> Could not find a valid solution after 1000 generations. Showing best result so far.</p>
+        </div>
+        <div id="board-ea-result" style="width: 320px; margin: auto auto; margin-bottom: 10px"></div>
         <div class="caption"><b>Figure 1:</b> Testing the EA.</div>
       </div>
+
+      <div>
+        <div class="caption">
+          <b>Table 1:</b> Comparison of representation mutation and crossover choices based on 1000 runs of each combination.
+          The table shows the best performing combination for each representation, as well as the average number of queens
+          without threats (fitness) of the best individual in the final population and the average number of generations
+          that it takes to find a result (capped at 1000 generations).
+        </div>
+        <table style="margin: auto auto">
+          <tr>
+            <th style="width: 150px">Representation</th>
+            <th style="width: 150px; text-align: center">Mutation</th>
+            <th style="width: 150px; text-align: center">Crossover</th>
+            <th style="width: 100px; text-align: center">Average Fitness</th>
+            <th style="width: 100px; text-align: center">Average Generations</th>
+          </tr>
+          <tr>
+            <td>Constrained Matrix</td>
+            <td style="text-align:center">Swap Mutation</td>
+            <td style="text-align:center">1-Point Crossover</td>
+            <td style="text-align:center">$$xxx$$</td>
+            <td style="text-align:center">$$yyy$$</td>
+          </tr>
+          <tr>
+            <td>Row Vector</td>
+            <td style="text-align:center">Swap Mutation</td>
+            <td style="text-align:center">1-Point Crossover</td>
+            <td style="text-align:center">$$xxx$$</td>
+            <td style="text-align:center">$$yyy$$</td>
+          </tr>
+          <tr>
+            <td>Column Vector</td>
+            <td style="text-align:center">Swap Mutation</td>
+            <td style="text-align:center">1-Point Crossover</td>
+            <td style="text-align:center">$$xxx$$</td>
+            <td style="text-align:center">$$yyy$$</td>
+          </tr>
+          <tr>
+            <td>Permutation Vector</td>
+            <td style="text-align:center">Swap Mutation</td>
+            <td style="text-align:center">Cycle Crossover</td>
+            <td style="text-align:center">$$xxx$$</td>
+            <td style="text-align:center">$$yyy$$</td>
+          </tr>
+        </table>
+      </div>
+
       <script type="module" src="chessboard/chessboard_evolutionary_algorithm.js"></script>
     </div>
     <div>

@@ -1,31 +1,55 @@
-import {highlightCollisions, example_positions, position_to_binary_board} from "./chessboard_utils.js";
-import {RowVectorIndividual, validateRowVectorIndividual} from "./rowVectorIndiduals.js"
-import {ColumnVectorIndividual, validateColumnVectorIndividual} from "./columnVectorIndividuals.js"
-import {ConstrainedMatrixIndividual, validateConstrainedMatrixIndividual} from "./constrainedMatrixIndividuals.js"
-import {PermutationIndividual, validatePermutationIndividual} from "./permutationIndividual.js"
+import {
+    highlightCollisions,
+    example_positions,
+    position_to_binary_board,
+    column_vector_to_position
+} from "./chessboard_utils.js";
+import {RowVectorIndividual, validateRowVectorIndividual, RowVectorMutationOptions, RowVectorCrossoverOptions} from "./rowVectorIndiduals.js"
+import {ColumnVectorIndividual, validateColumnVectorIndividual, ColumnVectorCrossoverOptions, ColumnVectorMutationOptions} from "./columnVectorIndividuals.js"
+import {ConstrainedMatrixIndividual, validateConstrainedMatrixIndividual, ConstrainedMatrixCrossoverOptions, ConstrainedMatrixMutationOptions} from "./constrainedMatrixIndividuals.js"
+import {PermutationIndividual, validatePermutationIndividual, PermutationVectorMutationOptions, PermutationVectorCrossoverOptions} from "./permutationIndividual.js"
 
-let board = Chessboard('board-ea-test', {
+(function($, window) {
+    $.fn.replaceOptions = function(options) {
+        var self, $option;
+
+        this.empty();
+        self = this;
+
+        $.each(options, function(index, option) {
+            $option = $("<option></option>")
+                .attr("value", option.value)
+                .text(option.text);
+            self.append($option);
+        });
+    };
+})(jQuery, window);
+
+let board = Chessboard('board-ea-result', {
     draggable: false,
-    position: example_positions[0],
+    //position: example_positions[0],
 });
 
-let $board = $('#board-ea-test');
-
-position_to_binary_board(board.position());
-
-//runEvolutionaryAlgorithm(board);
-
 document.getElementById("awesome").addEventListener("click", doStuff);
+document.getElementById("even_more_awesome").addEventListener("click", runAll);
+$('#select_representation').change(function () {updateGUI()} );
+updateGUI();
+
+$("#progressbar").progressbar({
+    value: false
+});
 
 function doStuff(){
     //validatePermutationIndividual()
-
 
     let representationName = $('#select_representation').find(":selected").text();
     let mutationName = $('#select_mutation').find(":selected").text();
     let crossoverName = $('#select_crossover').find(":selected").text();
 
-    let repetitions = 1000;
+    runExtensive(representationName, mutationName, crossoverName);
+
+    /*
+    let repetitions = 1;
     let solvedRuns = 0;
     let totalGenerations = 0;
     for (let i = 0; i < repetitions; i++){
@@ -33,23 +57,76 @@ function doStuff(){
         if (result[0]) solvedRuns += 1;
         totalGenerations += result[1];
     }
-    console.log(representationName, mutationName, crossoverName, solvedRuns, totalGenerations/repetitions);
-
-
-
+    console.log(representationName, mutationName, crossoverName, solvedRuns, totalGenerations/repetitions);*/
 }
 
+function runAll(){
+    console.log("run all")
+
+    let representationName = $('#select_representation').find(":selected").text();
+    let mutations = $('#select_mutation')[0];
+    let crossovers = $('#select_crossover')[0];
+
+    for (let i= 0 ; i < mutations.options.length; i++) {
+        let mutationName = mutations.options[i].label;
+        for (let i = 0; i < crossovers.options.length; i++) {
+            let crossoverName = crossovers.options[i].label;
+
+            runExtensive(representationName, mutationName, crossoverName);
+        }
+    }
+}
+
+function runExtensive(representationName, mutationName, crossoverName){
+    let repetitions = 1000;
+
+    let solvedRuns = 0;
+    let totalFitness = 0;
+    let totalGenerations = 0;
+    for (let i = 0; i < repetitions; i++) {
+        if (i % 100 === 0)
+            console.log("run", i);
+        let result = runEvolutionaryAlgorithm(representationName, mutationName, crossoverName);
+        if (result[0]) solvedRuns += 1;
+        totalGenerations += result[2];
+        totalFitness += result[1];
+    }
+    console.log(representationName, mutationName, crossoverName, "solved:", solvedRuns, "average fitness",
+        totalFitness/repetitions, "average generations", totalGenerations / repetitions);
+}
+
+
 function updateGUI(){
-    var $selectRepresentation = $("#select_representation");
-    var $selectMutationion = $("#select_mutation");
+    console.log("updateGUI")
+    let representationName = $('#select_representation').find(":selected").text();
+
+    var $selectMutation = $("#select_mutation");
     var $selectCrossover = $("#select_crossover");
 
-    var options = [
-        {text: "one", value: 1},
-        {text: "two", value: 2}
-    ];
+    let mutations = []
+    let crossovers = []
 
-    $("#foo").replaceOptions(options);
+    switch (representationName){
+        case "Constrained Matrix":
+            mutations = ConstrainedMatrixMutationOptions;
+            crossovers = ConstrainedMatrixCrossoverOptions;
+            break;
+        case "Row Vector":
+            mutations = RowVectorMutationOptions;
+            crossovers = RowVectorCrossoverOptions;
+            break;
+        case "Column Vector":
+            mutations = ColumnVectorMutationOptions;
+            crossovers = ColumnVectorCrossoverOptions;
+            break;
+        case "Permutation Vector":
+            mutations = PermutationVectorMutationOptions;
+            crossovers = PermutationVectorCrossoverOptions;
+            break;
+    }
+
+    $selectMutation.replaceOptions(mutations.map((x, i) => {return {text: x, value: i+1};}));
+    $selectCrossover.replaceOptions(crossovers.map((x, i) => {return {text: x, value: i+1};}));
 }
 
 
@@ -57,6 +134,11 @@ function runEvolutionaryAlgorithm(representationName, mutationName, crossoverNam
     /*console.log(representationName);
     console.log(mutationName);
     console.log(crossoverName);*/
+
+    let alert = $( "#alert" )
+    let success = $( "#success" )
+    alert.get()[0].style.display = "none"
+    success.get()[0].style.display = "none"
 
     // parameters
     let populationsize = 10;
@@ -79,6 +161,8 @@ function runEvolutionaryAlgorithm(representationName, mutationName, crossoverNam
     }
 
     while (checkSolved(currentPopulation) === false && generations.length !== maxGenerations) {
+
+
         //console.log(currentPopulation.map(el => el.getFitness()))
         let mutationChilds = []
 
@@ -104,9 +188,23 @@ function runEvolutionaryAlgorithm(representationName, mutationName, crossoverNam
         currentPopulation = children.slice(0, populationsize);
         generations[generations.length] = currentPopulation;
     }
+    if (!checkSolved(currentPopulation))
+    {
+        alert.get()[0].style.display = "block"
+        success.get()[0].style.display = "none"
+    } else {
+        alert.get()[0].style.display = "none"
+        success.get()[0].style.display = "block"
+        success.children()[0].textContent = "Found a solution after " + generations.length + " generations."
+    }
+
+    let pos = currentPopulation[0].getPosition()
+    board.position(pos);
+    highlightCollisions($("#board-ea-result"), pos);
+
     //console.log("currentPopulation: " + currentPopulation.map(el => el.fitness))
     //console.log("the puzzle has been solved: " + checkSolved(currentPopulation) +" after " + generations.length +" generations");
-    return [checkSolved(currentPopulation), generations.length]
+    return [checkSolved(currentPopulation), currentPopulation[0].fitness, generations.length]
 }
 
 

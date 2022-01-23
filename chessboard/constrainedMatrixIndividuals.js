@@ -15,12 +15,12 @@ function shuffle(a) {
     return a;
 }
 
-export let ColumnVectorMutationOptions = [
+export let ConstrainedMatrixMutationOptions = [
     "Swap Mutation",
     "Shuffle Mutation"
 ];
 
-export let ColumnVectorCrossoverOptions = [
+export let ConstrainedMatrixCrossoverOptions = [
     "1-Point Crossover",
     "2-Point Crossover"
 ]

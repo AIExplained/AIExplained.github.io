@@ -21,7 +21,7 @@ export let PermutationVectorMutationOptions = [
     "Shuffle Mutation"
 ];
 
-export let ColumnVectorCrossoverOptions = [
+export let PermutationVectorCrossoverOptions = [
     "Cycle Crossover"
 ]
 
