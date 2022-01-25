@@ -30,25 +30,16 @@ let board = Chessboard('board-ea-result', {
     //position: example_positions[0],
 });
 
-document.getElementById("awesome").addEventListener("click", doStuff);
-document.getElementById("even_more_awesome").addEventListener("click", runAll);
+document.getElementById("run-ea-button").addEventListener("click", runEA);
 $('#select_representation').change(function () {updateGUI()} );
 updateGUI();
 
-$("#progressbar").progressbar({
-    value: false
-});
 
-function doStuff(){
-    //validatePermutationIndividual()
-
+function runEA(){
     let representationName = $('#select_representation').find(":selected").text();
     let mutationName = $('#select_mutation').find(":selected").text();
     let crossoverName = $('#select_crossover').find(":selected").text();
 
-    runExtensive(representationName, mutationName, crossoverName);
-
-    /*
     let repetitions = 1;
     let solvedRuns = 0;
     let totalGenerations = 0;
@@ -56,24 +47,6 @@ function doStuff(){
         let result = runEvolutionaryAlgorithm(representationName, mutationName, crossoverName);
         if (result[0]) solvedRuns += 1;
         totalGenerations += result[1];
-    }
-    console.log(representationName, mutationName, crossoverName, solvedRuns, totalGenerations/repetitions);*/
-}
-
-function runAll(){
-    console.log("run all")
-
-    let representationName = $('#select_representation').find(":selected").text();
-    let mutations = $('#select_mutation')[0];
-    let crossovers = $('#select_crossover')[0];
-
-    for (let i= 0 ; i < mutations.options.length; i++) {
-        let mutationName = mutations.options[i].label;
-        for (let i = 0; i < crossovers.options.length; i++) {
-            let crossoverName = crossovers.options[i].label;
-
-            runExtensive(representationName, mutationName, crossoverName);
-        }
     }
 }
 
@@ -198,9 +171,12 @@ function runEvolutionaryAlgorithm(representationName, mutationName, crossoverNam
         success.children()[0].textContent = "Found a solution after " + generations.length + " generations."
     }
 
+    currentPopulation.sort((a,b) => (a.fitness > b.fitness) ? -1 : ((b.fitness > a.fitness) ? 1 : 0))
+
     let pos = currentPopulation[0].getPosition()
     board.position(pos);
     highlightCollisions($("#board-ea-result"), pos);
+
 
     //console.log("currentPopulation: " + currentPopulation.map(el => el.fitness))
     //console.log("the puzzle has been solved: " + checkSolved(currentPopulation) +" after " + generations.length +" generations");

@@ -36,8 +36,8 @@ backbutton.click(function(){
         let i = step_description[step].split("found at index")[1].split(".")[0];
         divsCycles[Number(i)-1].style.color = "white";
     }
-    if (step_description[step].includes("Start new cycle at index ")) {
-        let i = step_description[step].split("Start new cycle at index ")[1].split(".")[0];
+    if (step_description[step].includes("Start the new cycle at index ")) {
+        let i = step_description[step].split("Start the new cycle at index ")[1].split(".")[0];
         divsCycles[Number(i)-1].style.color = "white";
     }
     step--;
@@ -50,8 +50,8 @@ nextbutton.click(function(){
         let i = step_description[step].split("found at index")[1].split(".")[0];
         divsCycles[Number(i)-1].style.color = "black";
     }
-    if (step_description[step].includes("Start new cycle at index ")) {
-        let i = step_description[step].split("Start new cycle at index ")[1].split(".")[0];
+    if (step_description[step].includes("Start the new cycle at index ")) {
+        let i = step_description[step].split("Start the new cycle at index ")[1].split(".")[0];
         divsCycles[Number(i)-1].style.color = "black";
     }
 
@@ -106,7 +106,7 @@ function cycle_detection(divsParent1, divsParent2, divsCycles){
     let cycleNumber = 1;
     for (let i = 0; i < 8; i++){
         if (cycles[i] === 0){
-            step_description = step_description.concat("Start new cycle at index " + (i+1) + ". Search for value " + parent1[i] + " in Parent 2. ")
+            step_description = step_description.concat("Start the new cycle at index " + (i+1) + ". Search for value " + parent1[i] + " in Parent 2. ")
             let cycle_indices = get_cycle_indices(i, parent1, parent2);
             //console.log(cycle_indices);
             step_description = step_description.concat("Value "+ parent1[cycle_indices.at(-1)] + " found at index "+ (i+1) + ". Cycle " + (cycleNumber) + " complete. Mark cycle indices in cycle vector.")
