@@ -216,7 +216,7 @@
       <div class="caption"><b>Figure 2:</b> Types of invalid combinations in the 8-Queens problem.</div>
     </div>
     <p>
-      To solve the 8-Queen problem using an evolutionary algorithm, the problem needs to be transformed into an optimization problem.
+      To solve the 8-Queen problem using a genetic algorithm, the problem needs to be transformed into an optimization problem.
       A simple function to be optimized would answer the question if the candidate solution solves the puzzle.
       This function would return the value 1 (yes) in case the puzzle is solved and 0 (no) in case the current board position is invalid.
       However, this would not give the algorithm much information to select promising candidate solutions.
@@ -1174,7 +1174,7 @@
       </div>
 
       <div class="box" style="display: flex; margin-left: -20px; margin-top:20px; margin-bottom:1em; justify-content: center;">
-        <button id="run-ea-button" style="width: 200px">Run Evolutionary Algorithm</button>
+        <button id="run-ea-button" style="width: 200px">Run Genetic Algorithm</button>
       </div>
 
       <div class="l-body" style="margin-bottom: 20px">
@@ -1189,7 +1189,7 @@
         <div class="caption"><b>Figure 24:</b> Test a combination of representation, mutation, and crossover of your choice.
         First, select a representation in the dropdown menu at the top. Mutation and crossover choices will be updated
         to match their applicability to the chosen representation. After having selected all three, you can click the
-        button to run an evolutionary algorithm for 1000 generations. In case a solution has been found, the
+        button to run a genetic algorithm for 1000 generations. In case a solution has been found, the
         algorithm will terminate early and show the number of generations spent to find the result. In any case,
         the best candidate solution of the final population will be shown on the board.</div>
       </div>
