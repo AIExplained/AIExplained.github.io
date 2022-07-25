@@ -32,18 +32,18 @@
   <distill-header></distill-header>
   <d-front-matter>
     <script id='distill-front-matter' type="text/json">{
-    "title": "Choosing Representation, Mutation, and Crossover in Evolutionary Algorithms",
-    "description": "Learn how the choice of representation affects your evolutionary algorithm.",
+    "title": "Choosing Representation, Mutation, and Crossover in Genetic Algorithms",
+    "description": "Learn how the choice of representation and operators affects your genetic algorithm.",
     "published": "Nov 26, 2021",
     "authors": [
       {
         "author":"Alexander Dockhorn",
         "authorURL":"https://adockhorn.github.io/",
-        "affiliations": [{"name": "Otto von Guericke University Magdeburg"}]
+        "affiliations": [{"name": "Leibniz University Hannover"}]
       },
       {
         "author":"Simon Lucas",
-        "authorURL":"https://github.com/SimonLucas/",
+        "authorURL":"https://gaigresearch.github.io/members/Simon-Lucas",
         "affiliations": [{"name": "Queen Mary University London"}]
       }
     ],
@@ -56,8 +56,8 @@
   }</script>
   </d-front-matter>
   <d-title>
-    <p>An interactive article on solving the 8-Queens problem.
-      Learn how the choice of representation affects your evolutionary algorithm.</p>
+    <p>An interactive article on using genetic algorithms to solve the 8-Queens problem.
+      Learn how the choice of representation and operators affects your genetic algorithm.</p>
   </d-title>
   <d-byline></d-byline>
   <d-article id="root">
@@ -140,27 +140,27 @@
     <div>
       <p>
         Evolutionary algorithms (EAs) can be used to solve plenty of tasks using the power of evolutionary optimization.
-        They belong to the family of biologically inspired meta-heuristics and therefore adopt principles from
+        They belong to the family of biologically inspired meta-heuristics and adopt principles from
         biological evolution to modify, select and iteratively
-        improve a set of candidate solutions (also called population) to an optimization problem.
-        While many types of EAs exist, this work will focus on genetic algorithms as the most common representative
+        improve a set of candidate solutions (also called a population) to an optimization problem.
+        While many types of EAs exist, this work will focus on genetic algorithms (GA) as the most common representative
         of EAs.
         Most commonly, they consist of:
       </p>
       <ul>
-        <li> <b>Representation:</b> identification and encoding of decision variables for the given optimization problem
-          that represents a candidate solution</li>
+        <li> <b>Representation:</b> identification and encoding of decision variables as an individual that
+          represents a candidate solution to the given optimization problem.</li>
         <li> <b>Population:</b> a set of candidate solutions. Each iteration of the algorithm will produce a new
           generation of the population.</li>
         <li> <b>Fitness Evaluation:</b> a function measuring the quality of any candidate solution for the given
-          optimization problem</li>
+          optimization problem.</li>
         <li> <b>Selection:</b> a method for selecting well-performing candidate solutions as the input for genetic
-          operators. Selected candidate solutions will further be called parents.</li>
+          operators. Selected candidate solutions are called parents.</li>
         <li> <b>Genetic Operators:</b> methods that produce a new candidate solution by either modifying an existing
           candidate solution (mutation) or combining elements from multiple candidate solutions (crossover),
-          thereby producing a population of children</li>
+          thereby producing a population of children.</li>
         <li> <b>Reproduction:</b> a method that creates a new population of individuals given the previous
-          population and the children population created by the genetic operators</li>
+          population and the children population created by the genetic operators.</li>
       </ul>
     </div>
 
@@ -170,32 +170,32 @@
       genetic modification. Next, we evaluate the fitness of resulting children and select the individuals that go
       into the next generation. The process repeats until the termination criteria are met or the maximum number of
       generations has been reached."/>
-      <div class="caption"><b>Figure 1:</b> Components and exemplary flowchart of a generic genetic algorithm.</div>
+      <div class="caption"><b>Figure 1:</b> Components and exemplary flowchart of a generic GA.</div>
     </div>
       <!--
     </details>-->
     <p>
       One of the key tasks in the algorithm design process is the choice of representation for a candidate solution.
-      Given an optimization task, we can identify multiple decision variables in finding an optimal solution.
+      Given an optimization task, multiple decision variables can be identified in finding an optimal solution.
       For example, when optimizing a car for speed we can modify its components, i.e.
       motor, tires, the size of its tank, etc.
       A solution candidate can be described by its phenotype and its genotype.
       The former is represented by the chosen car's components (a specific motor, a set of tires, and a tank's volume),
       while the latter represents an indirect representation of the car's
       configuration in a digital format (e.g., indices for each of the choices made).
-      During optimization, we will modify a candidate's genotype.
-      Based on a mapping between genotype and phenotype, we can create a phenotype description of a candidate solution,
+      During optimization, a candidate's genotype will be modified.
+      Based on a mapping between genotype and phenotype, a phenotype description of a candidate solution can be created,
       which in this case allows us to build a car according to the made choices.
-      This allows us to test the described configuration.
+      This also allows us to test the described configuration.
     </p>
 
     <p>
       The mapping between genotype and phenotype plays an important part in the algorithm's design.
-      In this article, we will present design concepts based on a discussion of the 8-Queens problem<d-cite bibtex-key="Rivin1994"></d-cite>.
-      This seemingly simple puzzle requires you to place eight queens on an $$8\times8$$ chessboard so
+      This article presents design concepts based on a discussion on the 8-Queens problem<d-cite bibtex-key="Rivin1994"></d-cite>.
+      This seemingly simple puzzle requires placing eight queens on an $$8\times8$$ chessboard so
       that no two queens threaten each other.
       Thus, no two queens share the same row, column, or diagonal.
-      The images below show positions in which two queens threaten each other.
+      The figure below shows positions in which two queens threaten each other.
     </p>
     <div class="l-body" style="margin-bottom: 20px">
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -216,13 +216,13 @@
       <div class="caption"><b>Figure 2:</b> Types of invalid combinations in the 8-Queens problem.</div>
     </div>
     <p>
-      To solve the 8-Queen problem using an evolutionary algorithm, we need to transform it into an optimization problem.
-      A simple function to be optimized would answer the question is the puzzle solved yet?
-      This function would return the number 1 in case the puzzle is solved and 0 in case the current board position is invalid.
+      To solve the 8-Queen problem using an evolutionary algorithm, the problem needs to be transformed into an optimization problem.
+      A simple function to be optimized would answer the question if the candidate solution solves the puzzle.
+      This function would return the value 1 (yes) in case the puzzle is solved and 0 (no) in case the current board position is invalid.
       However, this would not give the algorithm much information to select promising candidate solutions.
-      Instead, we can count the number of unthreatened queens placed on the board, returning values in the range from $$\lbrack 1, 8\rbrack$$.
-      Therefore, we will search for board positions that maximize the number of unthreatened queens and a value of 8 will signify
-      that we found a solution to the puzzle.
+      Instead, the number of unthreatened queens placed on the board can be counted, returning values in the range from $$\lbrace 0, 1, ..., 8\rbrace$$.
+      Therefore, the GA will search for board positions that maximize the number of unthreatened queens and a value of 8 signifies
+      that a solution to the puzzle is found.
     </p>
     <p>
       Do you think you are up to the task of solving the puzzle on your own?
@@ -239,26 +239,26 @@
 
 
     <h2>Representation</h2>
-    <p> An individual somehow needs to represent the solution that can be applied to our problem.
-      Here, we need to encode the position of queens on a chessboard.
+    <p> An individual needs to represent the solution that can be applied to the problem.
+      Here, it needs to encode the positions of queens on a chessboard.
       Let's first think, about the basic properties of our task and its likely solutions:
     </p>
     <ol>
-      <li>a chessboard offers 64 fields arranged in an $$8\times8$$ grid</li>
-      <li>the solution consists of exactly 8 queens</li>
-      <li id="prop_3">each row can include only one queen, otherwise, they would threaten each other</li>
-      <li id="prop_4">each column can include only one queen, otherwise, they would threaten each other</li>
-      <li>each diagonal can include only one queen, otherwise, they would threaten each other</li>
+      <li>a chessboard offers 64 fields arranged in an $$8\times8$$ grid.</li>
+      <li>the solution consists of exactly 8 queens.</li>
+      <li id="prop_3">each row can include only one queen; otherwise, they would threaten each other.</li>
+      <li id="prop_4">each column can include only one queen; otherwise, they would threaten each other.</li>
+      <li>each diagonal can include only one queen; otherwise, they would threaten each other.</li>
     </ol>
     <p>
-    Such requirements can be used to further constrain our optimization task.
+    Such requirements can be used to further constrain the optimization task.
     Each added constraint will make some of the unconstrained solution candidates invalid (since they violate the constraint)
-    and therefore directly impact the size of our search space.
-    In the following, we will consider a set of optimization tasks constructed by considering combinations of the above
-    constraints. For each of those, we will be able to identify different decision variables (phenotype) and
+    and therefore directly impact the size of the search space.
+    In the following, a set of optimization tasks constructed by considering combinations of the above
+    constraints will be considered. For each of those, we will be able to identify different decision variables (phenotype) and
     search for suitable encodings (genotype).
-    Overall, this results in different representations we can construct for solving the 8-Queens problem,
-      which allows us to compare them with each other.
+    Overall, this results in different representations that can be constructed for solving the 8-Queens problem,
+      which allows their comparison with each other.
     </p>
 
     <a class="marker" href="#matrix-representation"><span>Matrix Representation</span></a>
@@ -284,9 +284,9 @@
 
     <p style="margin-top: 20px">
       This encoding can produce any possible queen placement of 0 to 64 queens on a regular chessboard.
-      Hence, the solution to this puzzle will be included in the set of encodable phenotypes.
-      Sadly, it also lets us create many candidates that violate the other requirements.
-      Using this representation, we can produce a lot of different candidates. In total there are:
+      Hence, the solution to this puzzle is included in the set of encodable phenotypes.
+      Sadly, it also creates many candidates that violate the other requirements.
+      Using this representation, it can produce a lot of different candidates. In total there are:
     </p>
 
     <d-math block>
@@ -295,10 +295,10 @@
 
     <a class="marker" href="#constrained-matrix-representation"><span>Constrained Matrix Representation</span></a>
     <p id="constrained-matrix-representation">
-      Honestly, this might be a bit much to find one of the 92 solutions.
-      But we can easily improve this by adding the second property to constrain our encoding, namely that no solution can have more or less than 8 queens.
-      Therefore, we need to limit the number of queens in our matrix to exactly 8.
-      This time, our genotype corresponds to moving a queen on the board, because they can neither be spawned nor removed from the board.
+      This might be a bit much to find one of the 92 solutions (including 12 unique solutions and all their rotations and reflections).
+      But it can easily be improved by adding the second property to constrain the encoding, namely that no solution can have more or less than 8 queens.
+      Therefore, it limits the number of queens in the matrix to exactly 8.
+      This time, our genotype corresponds to moving a queen on the board because they can neither be spawned nor removed from the board.
       In case you tried to find a solution yourself at the beginning of this article, you have already used a similar phenotype representation above.
     </p>
     <div class="l-body" style="margin-bottom: 20px">
@@ -316,16 +316,16 @@
 
     <p>
       While this seems to be a small but intuitive change, it has a massive impact on the number of possible solutions.
-      Instead of $$2^{64}$$ it can only produce:
-      $$\binom{64}{8} = 4\,426\,165\,368$$
+      Instead of $$2^{64}$$, it produces only:
+      $$\binom{64}{8} = 4\,426\,165\,368$$ combinations.
     </p>
 
     <a class="marker" href="#row-vector-representation"><span>Row Vector Representation</span></a>
     <p id="row-vector-representation">
-      So far, we have incorporated the first two requirements in our encoding.
-      We can do even better by adding the constraints on rows, columns, and diagonals to it.
+      So far, the first two requirements have been incorporated in the constrained matrix encoding.
+      This can be further improved by adding the constraints on rows, columns, and diagonals to it.
       Let us consider an even more compressed representation by adding the third property, according to which each row can contain only a single queen.
-      Therefore, we can use a vector of size 8 to encode the column in which each queen is located.
+      Therefore, a vector of size 8 can be used to encode the column in which each queen is located.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -345,23 +345,23 @@
       </div>
       <div class="caption"><b>Figure 6:</b> Pheno- and genotype row vector representation of the 8-Queens problem. Click on any cell of the vector to randomly move the respective queen to a new column.
         Alternatively, you can drag and drop queens on the board along the x-axis.
-        Note, that queens cannot be moved to another row since this is forbidden in our encoding.
+        Note that queens cannot be moved to another row since this is forbidden in this encoding.
       </div>
       <script type="module" src="chessboard/chessboard_row_vector_representation.js"></script>
     </div>
     <p style="margin-top: 20px">
       This might reduce usability for a human user, but the computer will have fewer problems with this.
       In fact, the reduction to even fewer candidate solutions can drastically speed up the time until a solution is found.
-      Implementing a row vector encoding results in even less candidate solutions:
+      Implementing a row vector encoding results in even fewer candidate solutions:
       $$8^8 = 16\,777\,216$$
     </p>
 
     <a class="marker" href="#column-vector-representation"><span>Column Vector Representation</span></a>
     <p id="column-vector-representation">
-      An interesting detail of the 8-Queens problem is its symmetry.
+      An interesting feature of the 8-Queens problem is its symmetry.
       This means a valid solution may be mirrored and rotated to produce new solutions.
       The same symmetry can be found in the two properties <a href="#prop_3">three</a> and <a href="#prop_4">four</a>.
-      Hence, we could have implemented a column vector encoding instead of using a row vector.
+      Hence, a column vector encoding can be used in place of a row vector.
     </p>
 
     <div>
@@ -385,17 +385,17 @@
       </div>
       <div class="caption"><b>Figure 7:</b> Pheno- and genotype column vector representation of the 8-Queens problem. Click on any cell of the vector to randomly move the respective queen to a new row.
         Alternatively, you can drag and drop queens on the board, but only place a queen on another row of the same column.
-        Note, that due to the genotype's constraints, queens cannot be moved to another column.
+        Note that due to the genotype's constraints, queens cannot be moved to another column.
       </div>
       <script type="module" src="chessboard/chessboard_column_vector_representation.js"></script>
     </div>
 
     <a class="marker" href="#permutation-representation"><span style="margin-top: 20px">Permutation Representation</span></a>
     <p id="permutation-representation">
-      Until now, we have either added property 3 or 4.
-      Including both of them at the same time, makes the representation slightly more complicated,
-      but once again helps us to reduce the number of candidate solutions.
-      In terms of a column vector, this would mean each row index can only be included once.
+      Until now, either property 3 or 4 has been used.
+      Including both of them at the same time makes the representation slightly more complicated,
+      but once again it helps to reduce the number of candidate solutions.
+      In terms of a column vector, each row index can only be included once.
       Hence, each column vector is effectively a permutation of row indices.
       This results in a small number of
       $$8! = 40320$$
@@ -423,27 +423,28 @@
         </div>
       </div>
       <div class="caption">
-        <b>Figure 8:</b> Pheno- and genotype permutation vector representation of the 8-Queens problem. Click on two queens or their respective vector cells to swap their position.
+        <b>Figure 8:</b> Pheno- and genotype permutation vector representation of the 8-Queens problem.
+        Click on two queens or their respective vector cells to swap their positions.
       </div>
       <script type="module" src="chessboard/chessboard_permutation_representation.js"></script>
     </div>
 
     <a class="marker" href="#comparison"><span style="margin-top: 20px">Comparison of Representations</span></a>
     <p id="comparison">
-      Up to now, we have introduced five representations for the 8-queens problem.
-      Before we discuss their respective mutation and crossover operators, we will
+      Up to now, five representations for the 8-queens problem have been introduced.
+      Before we discuss their respective mutation and crossover operators, we
       shortly summarize what we have learned so far.
     </p>
 
     <p>
-      As we have seen above, the representation defines the search space of our optimization problem.
-      By including a larger number of requirements in our optimization task and adapting our representation to
-      match these constraints, we can reduce the search space to a feasible size, and therefore, speed up the
+      As stated above, the representation defines the search space of the optimization problem.
+      By including a larger number of requirements in the optimization task and adapting a representation to
+      match these constraints, the search space can be reduced to a feasible size, and therefore, speed up the
       optimization process.
-      So far, we have only used representations that can produce all solutions to our problem.
-      It is also possible to use more restrictive search spaces, but this can come at the cost of solutions
+      So far, only representations that can produce all solutions to the problem have been used.
+      It is also possible to use a more restrictive search space, but this can come at the cost of solutions
       becoming impossible to be found.
-      Below is an overview of the proposed representations, their individual size, and their search spaces.
+      Below is an overview of the introduced representations, their individual size, and their search spaces.
     </p>
     <div>
       <div class="caption">
@@ -485,7 +486,7 @@
 
     <p style="margin-top: 20px">
       We have already seen the different representations in action.
-      Below, we see a comparison of representations and the individuals they can encode.
+      Below, a comparison of representations and the individuals they can encode is presented.
     </p>
 
     <div>
@@ -530,7 +531,7 @@
 
     <h2>Mutation</h2>
     <p>
-      Mutation is an evolutionary operator that modifies a single individual of our population.
+      Mutation is an evolutionary operator that modifies a single individual of the population.
       It is often used for a local exploration of the search space to further exploit a promising solution.
       This is achieved by making small changes to a candidate solution so that the resulting individual
       is similar to its parent.
@@ -539,8 +540,8 @@
     <a class="marker" href="#bit-mutation"><span>Bit Mutation</span></a>
     <p id="bit-mutation">
       A simple mutation operator is the <em>bit mutation</em>.
-      For any individual that is represented by a collection of bits, we randomly flip one of them,
-      therefore, turning a $$1$$ to a $$0$$ or vice versa.
+      For any individual that is represented by a collection of bits, bit mutation randomly flips one of them,
+      i.e., turning a $$1$$ to a $$0$$ or vice versa.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -555,7 +556,7 @@
     <script type="module" src="chessboard/bit_mutation.js"></script>
 
     <p style="margin-top: 20px">
-      The same operator has been used before when introducing the matrix representation.
+      The same operator has been used in the matrix representation.
     </p>
     <div>
       <div style="overflow: hidden; width:max-content; margin: auto auto">
@@ -572,7 +573,7 @@
     <a class="marker" href="#value-mutation"><span style="margin-top: 20px">Value Mutation</span></a>
     <p id="value-mutation">
       Leaving the realm of binary operators behind, we explore how the same concepts can be applied to other value ranges.
-      For this purpose, we need to select a sampling method for the mutation.
+      For this purpose, a sampling method for the mutation needs to be selected.
       The simplest choice is a uniform distribution that randomly selects one among all the possible values.
       See below for some examples for various sample spaces and how to mutate them.
     </p>
@@ -594,7 +595,8 @@
     </div>
 
     <p style="margin-top: 20px">
-      We can use the same concept for row and column vectors. A row vector's value space consists of the column names $$\{a, \ldots, h\}$$
+      The same concept can be used for row and column vectors.
+      A row vector's value space consists of the column names $$\{a, \ldots, h\}$$
       while a column vector's values include the row numbers $$[1, \ldots, 8]$$.
       Both can be tested below:
     </p>
@@ -622,19 +624,19 @@
 
     <p style="margin-top: 20px">
       Finally, the permutation vector needs some special attention.
-      Since each value of the vector can only be used once, we cannot simply replace a value with a random new one.
-      However, we can introduce a new class of mutations, that is suitable for permutations.
+      Since each value of the vector can only be used once, it cannot simply replace a value with a random new one.
+      A new class of mutations, that is suitable for permutations is introduced below.
     </p>
 
     <a class="marker" href="#swap-mutation"><span>Transposition and Swap Mutations</span></a>
     <p id="swap-mutation">
-      The binary and value mutation operators do not work for the constrained matrix representation.
+      Binary and value mutation operators do not work for the constrained matrix representation.
       A single bit-flip would either add another one or remove one of the many zeros.
-      Thus, violating the constraint of having exactly 8 queens on the board.
+      Thus, it violates the constraint of having exactly 8 queens on the board.
       Similarly, any singular value mutation to a permutation representation will cause an invalid vector.
-      Therefore, we introduce another class of mutations called the <em>transposition or swap mutation</em>.
-      Instead of choosing a single position to be randomly changed, we need to choose at least two positions to be rearranged.
-      Below, you can try out a swap mutation for the constrained matrix representation, that has already been featured above.
+      Therefore, another class of mutations called the <em>transposition and swap mutation</em> is introduced.
+      Instead of choosing a single position to be randomly changed, it requires at least two positions to be rearranged.
+      Below, you can try out a swap mutation for the constrained matrix representation, already featured above.
     </p>
 
     <div class="l-body" style="margin-bottom: 20px">
@@ -663,7 +665,7 @@
       </div>
       <div class="caption">
         <b>Figure 15:</b> Swap mutation for the permutation vector representation of the 8 Queens problem.
-        Click on two queens or their respective vector cells to swap their position.
+        Click on two queens or their respective vector cells to swap their positions.
       </div>
       <script type="module" src="chessboard/chessboard_permutation_representation2.js"></script>
     </div>
@@ -675,7 +677,7 @@
       Similar to the swap mutation, they just reposition existing values but cannot introduce new values to the vector.
       An inversion mutation inverts the values of a chosen subsequence without moving the subsequence.
       In contrast, the shuffle mutation randomly reorders the values of a chosen subsequence but keeps the remainder of the vector as it is.
-      Both of these operators keep a permutation vector intact and can also be applied to less restrictive genotypes.
+      Both of these operators keep a permutation vector intact and can be applied to less restrictive genotypes.
     </p>
 
     <div>
@@ -709,21 +711,21 @@
         <b>Figure 16:</b> Inversion and shuffle mutation for vector-based representations of the 8-Queens problems.
         Use the sliders to set the range to which the mutation should be applied.
         The updated subsequence will be highlighted in red.
-        Note, how the shuffle mutation can produce different outcomes for the same subsequence.
+        Note how the shuffle mutation can produce different outcomes for the same subsequence.
       </div>
     </div>
     <script type="module" src="chessboard/inversion_shuffle_mutation.js"></script>
 
     <p style="margin-top: 20px">
       Inversion and shuffle mutations can also be implemented for matrix representations and other types of encodings.
-      In the case of a matrix, we would invert or shuffle a set of cells to rearrange the board.
+      In the case of a matrix, the mutation inverts or shuffles a set of cells to rearrange the board.
     </p>
 
     <a class="marker" href="#comparison-mutation"><span>Comparison of Mutation Operators</span></a>
     <p id="comparison-mutation">
       Many more mutation operators can be found, but those discussed above will suffice in the context of the 8-Queens problem.
-      To shortly summarize discussed mutation operators, we prepared an overview in terms of their determinism after the target index/indices have been selected and
-      their ability to preserve a permutation, below.
+      the following table presents a comparison of discussed mutation operators in terms of their determinism
+      after the target index/indices have been selected and their ability to preserve a permutation.
     </p>
     <div >
       <div class="caption">
@@ -764,7 +766,7 @@
     </div>
 
     <p style="margin-top: 20px">
-      Despite that, the mutation operator is one component to locally search the space around promising solution candidates.
+      Despite that, the mutation operator is one component to locally search the space around promising candidate solutions.
       The next section will discuss another type of genetic operator that is often used in conjunction with mutation.
     </p>
 
@@ -772,16 +774,15 @@
 
     <h2>Crossover</h2>
     <p>
-      The crossover is an evolutionary operator that uses two or more candidate solutions to create a new one.
-      The original candidate solutions will be called parents and the resulting individuals will be called children, respectively.
+      Crossover is an evolutionary operator that uses two or more candidate solutions to create a new one.
+      The original candidate solutions are called parents, and the resulting individuals are called children.
       Similar to the mutation operator, a crossover needs to fit the underlying representation of an individual.
       So far, we have learned about matrix and vector representations and here we will learn some common crossover techniques.
     </p>
 
     <a class="marker" href="#1point-crossover"><span>1-Point Crossover</span></a>
     <p id="1point-crossover">
-      The first and most basic variant is the single-point crossover.
-      Here, we first choose a cutoff point.
+      The first and most basic variant is the single-point crossover. It chooses a single cutoff point.
       Elements to the left of this cutoff point will be filled with information from parent 1,
       whereas elements to the right will be filled with information from parent 2.
     </p>
@@ -812,7 +813,8 @@
           </div>
         </div>
         <div class="caption">
-          <b>Figure 17:</b> Visualization of a 1-point crossover between two matrices. Move the slider to shift the cutoff point. See how the child matrix consists of elements of both its parents.
+          <b>Figure 17:</b> Visualization of a 1-point crossover between two matrices.
+          Move the slider to shift the cutoff point. See how the child matrix consists of elements of both parents.
         </div>
       </div>
     </div>
@@ -862,8 +864,8 @@
     <a class="marker" href="#2point-crossover"><span>2-Point Crossover</span></a>
     <p id="2point-crossover">
       The two-point crossover uses not just one but two cutoff points.
-      Elements in between both points will be selected from the second parent,
-      whereas elements outside will be picked from the first.
+      Elements in between both points are selected from parent 2,
+      whereas elements outside will be picked from parent 1.
     </p>
 
     <div>
@@ -905,12 +907,11 @@
 
     <a class="marker" href="#uniform-crossover"><span>Uniform Crossover</span></a>
     <p id="uniform-crossover">
-      We can further generalize the concept by selecting even more cutoff points.
-      A more variable approach is the uniform crossover in which we randomly pick
+      The concept can further be generalized by selecting even more cutoff points.
+      A more variable approach is the uniform crossover, which randomly picks
       the parent to sample the next element from.
-      Consider throwing a coin for each child element.
-      If the head turns up, we sample the element from the first parent,
-      for the tail we sample the element from the second parent.
+      Consider throwing a coin for each child element: if the head turns up, uniform crossover samples
+      the element from parent 1, for the tail it samples the element from parent 2.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -949,8 +950,8 @@
     <script type="module" src="chessboard/chessboard_vector_uniform_crossover.js"></script>
 
     <p>
-      Many crossover methods are not limited to two parents but can be extended to multiple parents.
-      Below we see the three-parent uniform crossover.
+      Many crossover operators are not limited to two parents but can be extended to multiple parents.
+      Below a three-parent uniform crossover is displayed.
     </p>
 
     <div style="overflow: hidden; margin: auto auto;">
@@ -999,18 +1000,19 @@
 
     <a class="marker" href="#cycle-crossover"><span>Cycle Crossover</span></a>
     <p id="cycle-crossover">
-      All the crossover methods we have seen so far can be applied to matrix and vector representations.
+      The above operators can be applied to matrix and vector representations.
       However, they are not suitable for permutations.
       The cycle crossover is a specialized crossover method that keeps permutations intact.
     </p>
 
     <p>
-      Given the vectors of two parents, we first identify the so-called cycles.
-      Therefore, we start with the first value of parent 1 and search for its occurrence in parent 2.
-      Once we found the value in parent 2, we use the value of parent 1 at the same index to once again search for it in parent 2.
-      This process is repeated until we get back to the first index of parent 1.
-      All indices visited will be added to the first cycle.
-      We repeat this process with the next value not yet sorted into a cycle until all values have been assigned to a cycle.
+      Given the vectors of two parents, it first identifies the so-called cycles.
+      The cycle crossover starts with the first value of parent 1 and searches for its occurrence in parent 2.
+      Once finding the value in parent 2, it uses the value of parent 1 at the same index to once again search for it in parent 2.
+      This process is repeated until the process gets back to the first index of parent 1 representing a complete cycle.
+      All indices visited will be added to this first cycle.
+      This process repeats with the next value not yet sorted into a cycle until all cycles have been identified.
+      Any two vectors can be split into one or multiple such cycles.
       The figure below shows the process of identifying all cycles in a given permutation.
     </p>
     <div>
@@ -1039,8 +1041,8 @@
     <script type="module" src="chessboard/chessboard_cycle_identification.js"></script>
 
     <p style="margin-top: 20px">
-      To produce the child vector, we copy the values of all odd cycles from parent 1 to their respective indices in the child vector.
-      Thereafter, we copy the values of all even cycles from parent 2 into the child vector.
+      To produce the child vector, the crossover copies the values of all odd cycles from parent 1 to their respective indices in the child vector.
+      Thereafter, the values of all even cycles from parent 2 are copied into the child vector.
       The figure below shows the result from the example above.
     </p>
 
@@ -1070,9 +1072,10 @@
 
     <a class="marker" href="#comparison-crossover"><span>Comparison of Crossover Operators</span></a>
     <p id="comparison-crossover">
-      This ends our overview of crossover operators. Similar to mutation operators, we can find many more specialized examples in the literature.
-      Nevertheless, the presented selection will suffice to efficiently solve the 8-Queens problem.
-      To summarize discussed crossover operators, we once again take a look at each operator's determinism (after selecting the respective cutoff-points or intervals) and preservation of permutations, below.
+      Similar to mutation operators, many specialized crossover operators have been proposed in the literature.
+      Nevertheless, the presented selection suffices to efficiently solve the 8-Queens problem.
+      To summarize the discussed crossover operators, the following table takes a look at each operator's determinism
+      (after selecting the respective cutoff-points or intervals) and preservation of permutations.
     </p>
     <div >
       <div class="caption">
@@ -1110,32 +1113,32 @@
     <h2>From Theory to Practice</h2>
     <p>
       In the following, we will set up a complete genetic algorithm to solve the 8-Queens problem using the reviewed
-      representations, mutation, and crossover operators. Therefore, we will need to define the remaining components
-      of the genetic algorithm as introduced at the beginning of this article.
+      representations, mutation, and crossover operators. Therefore, the remaining components
+      of the genetic algorithm as introduced at the beginning of this article need to be defined.
     </p>
     <ul>
-      <li> <b>Population:</b> A set of 10 individuals will be randomly initialized given the respective
+      <li> <b>Population:</b> A set of 10 individuals are randomly initialized given the respective
         representation.</li>
-      <li> <b>Fitness Evaluation:</b> the number of non-threatened queens will be reported as the fitness of an
-        individual</li>
-      <li> <b>Selection:</b> We will use tournament selection, a method that first selects a subset of candidate
-        solutions of which the best individual will become a parent for the genetic operators.
+      <li> <b>Fitness Evaluation:</b> The number of non-threatened queens is reported as the fitness of an
+        individual.</li>
+      <li> <b>Selection:</b> We use tournament selection, a method that first selects a subset of candidate
+        solutions, of which the best individual becomes a parent for the genetic operators.
         We will use a tournament/subset size of 4 and repeat this process until 10 individuals have been selected.
-        (Note, that this can include the same individual several times.)</li>
+        (Note that this can include the same individual several times.)</li>
       <li> <b>Genetic Operators:</b> We will make use of the mutation and crossover reviewed above, whereas we first
-        produce 10 children from mutating a copy of each parent individual and then 10 children the from the crossover
+        produce 10 children from mutating a copy of each parent individual and then 10 children from the crossover
         of random individuals of the parent set.
         The resulting 20 children will be used as input for the reproduction phase.</li>
-      <li> <b>Reproduction:</b> We will select the best 10 individuals to go into the population of the next generation
+      <li> <b>Reproduction:</b> We select the best 10 individuals to go into the population of the next generation
         from the set of produced children.</li>
     </ul>
     <p>
-      Given a combination of representation, mutation, and crossover, we run the optimization for a maximum of 1000
-      generations or terminate it early in case a solution has been found.
-      We want to point out, that this genetic algorithm has been designed with simplicity in mind.
+      Given a combination of representation, mutation, and crossover, the GA runs for a maximum of 1000
+      generations or terminates early in case a solution has been found.
+      We want to point out, that this GA is designed with simplicity in mind.
       In general, many choices can be made for each of the building blocks, but for our illustrative example, such a simple
       configuration will suffice to observe a difference among representations.
-      The following interactive example allows you to fill the gaps in representation, mutation, and crossover, and run
+      The following interactive example fills the gaps in representation, mutation, and crossover, and allows running
       your chosen combination.
     </p>
 
@@ -1184,8 +1187,8 @@
         </div>
         <div id="board-ea-result" style="width: 320px; margin: auto auto 10px;"></div>
         <div class="caption"><b>Figure 24:</b> Test a combination of representation, mutation, and crossover of your choice.
-        First, select a representation in the dropdown menu at the top. Mutation and crossover choices will update
-        to match their applicability to the chosen representation. After having selected all three you can click the
+        First, select a representation in the dropdown menu at the top. Mutation and crossover choices will be updated
+        to match their applicability to the chosen representation. After having selected all three, you can click the
         button to run an evolutionary algorithm for 1000 generations. In case a solution has been found, the
         algorithm will terminate early and show the number of generations spent to find the result. In any case,
         the best candidate solution of the final population will be shown on the board.</div>
@@ -1196,10 +1199,10 @@
 
     <a class="marker" href="#resultsdiscussion"><span>Results and Discussion</span></a>
     <p id="resultsdiscussion">
-      We have run the experiments on our own by repeating the evolutionary algorithm 1000 runs for each valid
-      combination of representation, mutation, and crossover. Thereafter, we ranked the combinations by their
-      success rate (finding a valid solution in 1000 generations). In case of a tie, the combination with the lower
-      number of average generations for finding a solution will be reported. The following table shows the best
+      We have run the experiments on our own by repeating the GA 1000 runs for each valid
+      combination of representation, mutation, and crossover. The combinations are ranked by their
+      success rates (finding a valid solution in 1000 generations). In case of a tie, the combination with the lower
+      number of average generations for finding a solution is reported. The following table shows the best
       combination of mutation and crossover for each of the introduced representations.
     </p>
 
@@ -1249,37 +1252,38 @@
     </div>
 
     <p style="margin-top: 2em">
-      From this example, we can see that the permutation vector has been the most reliable representation for solving
-      the 8-Queens problem with the lowest number of average generations until finding a solution. Both, the row vector
+      From this example, it can be seen that the permutation vector is the most reliable representation for solving
+      the 8-Queens problem with the lowest number of average generations until finding a solution. Both the row vector
       and the column vector representations show very similar results since they are based on two symmetric constraints.
       The constrained matrix performed the worst, which does not mean that it is unable to find a solution. The much
       larger size of the search space can produce many bad candidate solutions. For this reason, finding a true
-      solution to the 8-Queens problem becomes a daunting task and will require much more than just 1000 generations.
+      solution to the 8-Queens problem becomes a daunting task and requires much more than just 1000 generations.
     </p>
 
 
     <h2>Conclusion</h2>
     <p>
-      In this paper, we introduced several representations and their respective mutation and crossover operators for solving the 8-Queens Puzzle.
-      We have shown how the choice of representation impacts the size of the search space and imposes constraints on the choice of genetic operators.
+      This paper introduced several representations and their respective mutation and crossover operators
+      for solving the 8-Queens Puzzle. Is has been shown how the choice of representation impacts the size of the
+      search space and imposes constraints on the choice of genetic operators.
       Special attention has been given to permutation-preserving mutation and crossover operators.
     </p>
     <p>
       This overview has not covered all aspects of the algorithm's design process.
       Further elements such as initialization of the first population, fitness evaluation,
       selection, and reproduction should be well thought of when implementing an EA.
-      For this purpose, we refer to further introductory literature on
+      For this purpose, please refer to introductory literature on
       EAs<d-cite bibtex-key="Kruse2016"></d-cite> as well as more detailed selections of
       mutation<d-cite bibtex-key="back2000mutation"></d-cite> and crossover
-      operators<d-cite bibtex-key="AJ2015"></d-cite> can help to better understand the EA design process.
+      operators<d-cite bibtex-key="AJ2015"></d-cite>, which can help to better understand the EA design process.
     </p>
     <p>
-      For the interested reader, there are many more aspects that can be taken into account for the choice
+      For the interested readers, there are many more aspects that can be taken into account for the choice
       of a representation, including the relationship of a representation and the genetic
       operators<d-cite bibtex-key="Radcliffe1992"></d-cite>, the feasibility of a representation's
       genotype<d-cite bibtex-key="Palmer1995"></d-cite>,
       and that feasible solutions should be preferred over infeasible ones<d-cite bibtex-key="Ronald1997"></d-cite>.
-      We could continue this list for quite a while and it seems impossible to summarize a whole research field in
+      The list could be continued for quite a while and it seems impossible to summarize a whole research field in
       such a short article, but we hope the work at hand serves as a valuable introduction for readers who are new to the field.
     </p>
 
