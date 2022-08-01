@@ -143,7 +143,7 @@
         They belong to the family of biologically inspired meta-heuristics and adopt principles from
         biological evolution to modify, select and iteratively
         improve a set of candidate solutions (also called a population) to an optimization problem.
-        While many types of EAs exist, this work will focus on genetic algorithms (GA) as the most common representative
+        While many types of EAs exist, this work will focus on genetic algorithms (GA) <d-cite bibtex-key="Holland1992"></d-cite> as the most common representative
         of EAs.
         Most commonly, they consist of:
       </p>
@@ -432,7 +432,7 @@
     <a class="marker" href="#comparison"><span style="margin-top: 20px">Comparison of Representations</span></a>
     <p id="comparison">
       Up to now, five representations for the 8-queens problem have been introduced.
-      Before we discuss their respective mutation and crossover operators, we
+      Before discussing their respective mutation and crossover operators, we
       shortly summarize what we have learned so far.
     </p>
 
@@ -625,7 +625,7 @@
     <p style="margin-top: 20px">
       Finally, the permutation vector needs some special attention.
       Since each value of the vector can only be used once, it cannot simply replace a value with a random new one.
-      A new class of mutations, that is suitable for permutations is introduced below.
+      A new class of mutations, suitable for permutations is introduced below.
     </p>
 
     <a class="marker" href="#swap-mutation"><span>Transposition and Swap Mutations</span></a>
@@ -636,7 +636,7 @@
       Similarly, any singular value mutation to a permutation representation will cause an invalid vector.
       Therefore, another class of mutations called the <em>transposition and swap mutation</em> is introduced.
       Instead of choosing a single position to be randomly changed, it requires at least two positions to be rearranged.
-      Below, you can try out a swap mutation for the constrained matrix representation, already featured above.
+      Below, you can try out a swap mutation for the constrained matrix representation already featured above.
     </p>
 
     <div class="l-body" style="margin-bottom: 20px">
@@ -724,7 +724,7 @@
     <a class="marker" href="#comparison-mutation"><span>Comparison of Mutation Operators</span></a>
     <p id="comparison-mutation">
       Many more mutation operators can be found, but those discussed above will suffice in the context of the 8-Queens problem.
-      the following table presents a comparison of discussed mutation operators in terms of their determinism
+      The following table presents a comparison of discussed mutation operators in terms of their determinism
       after the target index/indices have been selected and their ability to preserve a permutation.
     </p>
     <div >
@@ -911,7 +911,7 @@
       A more variable approach is the uniform crossover, which randomly picks
       the parent to sample the next element from.
       Consider throwing a coin for each child element: if the head turns up, uniform crossover samples
-      the element from parent 1, for the tail it samples the element from parent 2.
+      the element from parent 1; for the tail it samples the element from parent 2.
     </p>
     <div>
       <div style="overflow: hidden; margin: auto auto; width: max-content">
@@ -1196,7 +1196,6 @@
     </div>
     <script type="module" src="chessboard/chessboard_evolutionary_algorithm.js"></script>
 
-
     <a class="marker" href="#resultsdiscussion"><span>Results and Discussion</span></a>
     <p id="resultsdiscussion">
       We have run the experiments on our own by repeating the GA 1000 runs for each valid
@@ -1264,7 +1263,7 @@
     <h2>Conclusion</h2>
     <p>
       This paper introduced several representations and their respective mutation and crossover operators
-      for solving the 8-Queens Puzzle. Is has been shown how the choice of representation impacts the size of the
+      for solving the 8-Queens Puzzle. It has been shown how the choice of representation impacts the size of the
       search space and imposes constraints on the choice of genetic operators.
       Special attention has been given to permutation-preserving mutation and crossover operators.
     </p>
